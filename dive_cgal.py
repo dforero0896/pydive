@@ -24,7 +24,7 @@ if __name__=='__main__':
         out_range=0
         for i in range(3):
             lower = points[points[:,i] < low_range + cpy_range]
-            lower[:,i] + box_size
+            lower[:,i] += box_size
             points = np.append(points, lower, axis=0)
             higher = points[points[:,i] >= high_range - cpy_range]
             higher[:,i] -= box_size
