@@ -6,7 +6,7 @@ import os
 import sys
 import argparse
 
-def pydive(points, r_min, r_max, box_size, is_box=False, cpy_range=80):
+def galaxies_to_voids(points, r_min, r_max, box_size, is_box=False, cpy_range=80):
 
     print(f"==> {points.shape[0]} tracers found.")
     if is_box:
@@ -60,7 +60,7 @@ if __name__=='__main__':
     box_size=2500
     print(f"==> Reading file {data_fn}", flush=True)
     points = pd.read_csv(data_fn, delim_whitespace=True, engine='c', names=['x', 'y', 'z'], usecols=[0,1,2]).values.astype(np.float64)
-    result = pydive(points, args.rmin, args.rmax, box_size, is_box, cpy_range=80)
+    result = galaxies_to_voids(points, args.rmin, args.rmax, box_size, is_box, cpy_range=80)
     print(f"==> Saving voids with radius ({args.rmin}, {args.rmax})")
     #c_ascii_writer(result, n_simplices, 'tests/voids_pydive.dat')
     np.savetxt(args.output_catalog, result, fmt="%.8f")
