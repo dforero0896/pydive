@@ -1,5 +1,4 @@
-from distutils.extension import Extension
-from distutils.core import setup
+from setuptools import setup, Extension, find_packages
 from Cython.Build import cythonize
 import numpy
 
@@ -13,5 +12,7 @@ myext = Extension("bin.helpers",
                  # extra_link_args=["-std=c++11"]
              )
 
-setup(name='helpers',
-      ext_modules=cythonize([myext]))
+setup(name='pydive',
+    author="Daniel Forero & Cheng Zhao",
+    packages=find_packages(),
+    ext_modules=cythonize([myext]))
