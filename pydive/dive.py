@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from scipy.spatial import Delaunay
-from helpers import single_circumsphere, get_void_catalog, get_void_catalog_parallel, c_ascii_writer
+from .helpers import single_circumsphere, get_void_catalog, get_void_catalog_parallel, c_ascii_writer
 import os
 import sys
 import argparse
