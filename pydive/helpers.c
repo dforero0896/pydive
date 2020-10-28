@@ -23,12 +23,12 @@
         "library_dirs": [
             "/usr/lib/x86_64-linux-gnu"
         ],
-        "name": "helpers",
+        "name": "pydive.helpers",
         "sources": [
-            "src/helpers.pyx"
+            "pydive/helpers.pyx"
         ]
     },
-    "module_name": "helpers"
+    "module_name": "pydive.helpers"
 }
 END: Cython Metadata */
 
@@ -634,8 +634,8 @@ static CYTHON_INLINE float __PYX_NAN() {
   #endif
 #endif
 
-#define __PYX_HAVE__helpers
-#define __PYX_HAVE_API__helpers
+#define __PYX_HAVE__pydive__helpers
+#define __PYX_HAVE_API__pydive__helpers
 /* Early includes */
 #include <string.h>
 #include <stdlib.h>
@@ -855,7 +855,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "src/helpers.pyx",
+  "pydive/helpers.pyx",
   "stringsource",
 };
 /* ForceInitThreads.proto */
@@ -967,14 +967,14 @@ typedef struct {
 } __Pyx_BufFmt_Context;
 
 
-/* "helpers.pyx":11
+/* "pydive/helpers.pyx":11
  * cdef extern from "math.h":
  *     double sqrt(double x) nogil
  * ctypedef int size_t             # <<<<<<<<<<<<<<
  * cdef extern from "gsl/gsl_block.h":
  *     ctypedef struct gsl_block:
  */
-typedef int __pyx_t_7helpers_size_t;
+typedef int __pyx_t_6pydive_7helpers_size_t;
 
 /*--- Type declarations ---*/
 struct __pyx_array_obj;
@@ -1776,7 +1776,7 @@ static PyObject *__pyx_memoryviewslice_assign_item_from_object(struct __pyx_memo
 
 /* Module declarations from 'libc.stdio' */
 
-/* Module declarations from 'helpers' */
+/* Module declarations from 'pydive.helpers' */
 static PyTypeObject *__pyx_array_type = 0;
 static PyTypeObject *__pyx_MemviewEnum_type = 0;
 static PyTypeObject *__pyx_memoryview_type = 0;
@@ -1788,9 +1788,9 @@ static PyObject *contiguous = 0;
 static PyObject *indirect_contiguous = 0;
 static int __pyx_memoryview_thread_locks_used;
 static PyThread_type_lock __pyx_memoryview_thread_locks[8];
-static double __pyx_f_7helpers_determinant(gsl_matrix *, size_t); /*proto*/
-static void __pyx_f_7helpers_remove_col(gsl_matrix *, gsl_matrix *, int, int, int); /*proto*/
-static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice, __Pyx_memviewslice); /*proto*/
+static double __pyx_f_6pydive_7helpers_determinant(gsl_matrix *, size_t); /*proto*/
+static void __pyx_f_6pydive_7helpers_remove_col(gsl_matrix *, gsl_matrix *, int, int, int); /*proto*/
+static void __pyx_f_6pydive_7helpers_circumsphere(__Pyx_memviewslice, __Pyx_memviewslice); /*proto*/
 static struct __pyx_array_obj *__pyx_array_new(PyObject *, Py_ssize_t, char *, char *, char *); /*proto*/
 static void *__pyx_align_pointer(void *, size_t); /*proto*/
 static PyObject *__pyx_memoryview_new(PyObject *, int, int, __Pyx_TypeInfo *); /*proto*/
@@ -1825,11 +1825,11 @@ static void __pyx_memoryview_slice_assign_scalar(__Pyx_memviewslice *, int, size
 static void __pyx_memoryview__slice_assign_scalar(char *, Py_ssize_t *, Py_ssize_t *, int, size_t, void *); /*proto*/
 static PyObject *__pyx_unpickle_Enum__set_state(struct __pyx_MemviewEnum_obj *, PyObject *); /*proto*/
 static __Pyx_TypeInfo __Pyx_TypeInfo_double = { "double", NULL, sizeof(double), { 0 }, 0, 'R', 0, 0 };
-#define __Pyx_MODULE_NAME "helpers"
-extern int __pyx_module_is_main_helpers;
-int __pyx_module_is_main_helpers = 0;
+#define __Pyx_MODULE_NAME "pydive.helpers"
+extern int __pyx_module_is_main_pydive__helpers;
+int __pyx_module_is_main_pydive__helpers = 0;
 
-/* Implementation of 'helpers' */
+/* Implementation of 'pydive.helpers' */
 static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_ValueError;
 static PyObject *__pyx_builtin_MemoryError;
@@ -1883,7 +1883,6 @@ static const char __pyx_k_struct[] = "struct";
 static const char __pyx_k_unpack[] = "unpack";
 static const char __pyx_k_update[] = "update";
 static const char __pyx_k_fortran[] = "fortran";
-static const char __pyx_k_helpers[] = "helpers";
 static const char __pyx_k_memview[] = "memview";
 static const char __pyx_k_oname_c[] = "oname_c";
 static const char __pyx_k_Ellipsis[] = "Ellipsis";
@@ -1909,15 +1908,16 @@ static const char __pyx_k_stringsource[] = "stringsource";
 static const char __pyx_k_pyx_getbuffer[] = "__pyx_getbuffer";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
 static const char __pyx_k_c_ascii_writer[] = "c_ascii_writer";
+static const char __pyx_k_pydive_helpers[] = "pydive.helpers";
 static const char __pyx_k_View_MemoryView[] = "View.MemoryView";
 static const char __pyx_k_allocate_buffer[] = "allocate_buffer";
 static const char __pyx_k_dtype_is_object[] = "dtype_is_object";
 static const char __pyx_k_pyx_PickleError[] = "__pyx_PickleError";
 static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
-static const char __pyx_k_src_helpers_pyx[] = "src/helpers.pyx";
 static const char __pyx_k_get_void_catalog[] = "get_void_catalog";
 static const char __pyx_k_pyx_unpickle_Enum[] = "__pyx_unpickle_Enum";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
+static const char __pyx_k_pydive_helpers_pyx[] = "pydive/helpers.pyx";
 static const char __pyx_k_strided_and_direct[] = "<strided and direct>";
 static const char __pyx_k_single_circumsphere[] = "single_circumsphere";
 static const char __pyx_k_strided_and_indirect[] = "<strided and indirect>";
@@ -1993,7 +1993,6 @@ static PyObject *__pyx_n_s_get_void_catalog;
 static PyObject *__pyx_n_s_get_void_catalog_parallel;
 static PyObject *__pyx_n_s_getstate;
 static PyObject *__pyx_kp_s_got_differing_extents_in_dimensi;
-static PyObject *__pyx_n_s_helpers;
 static PyObject *__pyx_n_s_i;
 static PyObject *__pyx_n_s_id;
 static PyObject *__pyx_n_s_import;
@@ -2020,6 +2019,8 @@ static PyObject *__pyx_n_s_out;
 static PyObject *__pyx_n_s_output;
 static PyObject *__pyx_n_s_pack;
 static PyObject *__pyx_n_s_pickle;
+static PyObject *__pyx_n_s_pydive_helpers;
+static PyObject *__pyx_kp_s_pydive_helpers_pyx;
 static PyObject *__pyx_n_s_pyx_PickleError;
 static PyObject *__pyx_n_s_pyx_checksum;
 static PyObject *__pyx_n_s_pyx_getbuffer;
@@ -2037,7 +2038,6 @@ static PyObject *__pyx_n_s_setstate_cython;
 static PyObject *__pyx_n_s_shape;
 static PyObject *__pyx_n_s_single_circumsphere;
 static PyObject *__pyx_n_s_size;
-static PyObject *__pyx_kp_s_src_helpers_pyx;
 static PyObject *__pyx_n_s_start;
 static PyObject *__pyx_n_s_step;
 static PyObject *__pyx_n_s_stop;
@@ -2052,10 +2052,10 @@ static PyObject *__pyx_kp_s_unable_to_allocate_shape_and_str;
 static PyObject *__pyx_n_s_unpack;
 static PyObject *__pyx_n_s_update;
 static PyObject *__pyx_n_s_vertices;
-static PyObject *__pyx_pf_7helpers_single_circumsphere(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_vertices); /* proto */
-static PyObject *__pyx_pf_7helpers_2get_void_catalog(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_vertices, __Pyx_memviewslice __pyx_v_output, int __pyx_v_n_simplices); /* proto */
-static PyObject *__pyx_pf_7helpers_4get_void_catalog_parallel(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_vertices, __Pyx_memviewslice __pyx_v_output, CYTHON_UNUSED int __pyx_v_n_simplices); /* proto */
-static PyObject *__pyx_pf_7helpers_6c_ascii_writer(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_oarr, int __pyx_v_n_elem, PyObject *__pyx_v_oname); /* proto */
+static PyObject *__pyx_pf_6pydive_7helpers_single_circumsphere(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_vertices); /* proto */
+static PyObject *__pyx_pf_6pydive_7helpers_2get_void_catalog(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_vertices, __Pyx_memviewslice __pyx_v_output, int __pyx_v_n_simplices); /* proto */
+static PyObject *__pyx_pf_6pydive_7helpers_4get_void_catalog_parallel(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_vertices, __Pyx_memviewslice __pyx_v_output, CYTHON_UNUSED int __pyx_v_n_simplices); /* proto */
+static PyObject *__pyx_pf_6pydive_7helpers_6c_ascii_writer(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_oarr, int __pyx_v_n_elem, PyObject *__pyx_v_oname); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array_2__getbuffer__(struct __pyx_array_obj *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_array___pyx_pf_15View_dot_MemoryView_5array_4__dealloc__(struct __pyx_array_obj *__pyx_v_self); /* proto */
@@ -2144,7 +2144,7 @@ static PyObject *__pyx_codeobj__27;
 static PyObject *__pyx_codeobj__34;
 /* Late includes */
 
-/* "helpers.pyx":47
+/* "pydive/helpers.pyx":47
  * 
  * 
  * cdef double determinant(gsl_matrix * matrix, size_t dimension) nogil:             # <<<<<<<<<<<<<<
@@ -2152,13 +2152,13 @@ static PyObject *__pyx_codeobj__34;
  *     cdef int signum
  */
 
-static double __pyx_f_7helpers_determinant(gsl_matrix *__pyx_v_matrix, size_t __pyx_v_dimension) {
+static double __pyx_f_6pydive_7helpers_determinant(gsl_matrix *__pyx_v_matrix, size_t __pyx_v_dimension) {
   int __pyx_v_signum;
   gsl_permutation *__pyx_v_p;
   double __pyx_v_det;
   double __pyx_r;
 
-  /* "helpers.pyx":50
+  /* "pydive/helpers.pyx":50
  *     """ Computes determinant of 'matrix' but destroys it"""
  *     cdef int signum
  *     cdef gsl_permutation *p = gsl_permutation_alloc(dimension)             # <<<<<<<<<<<<<<
@@ -2167,7 +2167,7 @@ static double __pyx_f_7helpers_determinant(gsl_matrix *__pyx_v_matrix, size_t __
  */
   __pyx_v_p = gsl_permutation_alloc(__pyx_v_dimension);
 
-  /* "helpers.pyx":51
+  /* "pydive/helpers.pyx":51
  *     cdef int signum
  *     cdef gsl_permutation *p = gsl_permutation_alloc(dimension)
  *     gsl_linalg_LU_decomp (matrix, p, &signum)             # <<<<<<<<<<<<<<
@@ -2176,7 +2176,7 @@ static double __pyx_f_7helpers_determinant(gsl_matrix *__pyx_v_matrix, size_t __
  */
   (void)(gsl_linalg_LU_decomp(__pyx_v_matrix, __pyx_v_p, (&__pyx_v_signum)));
 
-  /* "helpers.pyx":52
+  /* "pydive/helpers.pyx":52
  *     cdef gsl_permutation *p = gsl_permutation_alloc(dimension)
  *     gsl_linalg_LU_decomp (matrix, p, &signum)
  *     cdef double det = gsl_linalg_LU_det(matrix, signum)             # <<<<<<<<<<<<<<
@@ -2185,7 +2185,7 @@ static double __pyx_f_7helpers_determinant(gsl_matrix *__pyx_v_matrix, size_t __
  */
   __pyx_v_det = gsl_linalg_LU_det(__pyx_v_matrix, __pyx_v_signum);
 
-  /* "helpers.pyx":53
+  /* "pydive/helpers.pyx":53
  *     gsl_linalg_LU_decomp (matrix, p, &signum)
  *     cdef double det = gsl_linalg_LU_det(matrix, signum)
  *     return det             # <<<<<<<<<<<<<<
@@ -2195,7 +2195,7 @@ static double __pyx_f_7helpers_determinant(gsl_matrix *__pyx_v_matrix, size_t __
   __pyx_r = __pyx_v_det;
   goto __pyx_L0;
 
-  /* "helpers.pyx":47
+  /* "pydive/helpers.pyx":47
  * 
  * 
  * cdef double determinant(gsl_matrix * matrix, size_t dimension) nogil:             # <<<<<<<<<<<<<<
@@ -2208,7 +2208,7 @@ static double __pyx_f_7helpers_determinant(gsl_matrix *__pyx_v_matrix, size_t __
   return __pyx_r;
 }
 
-/* "helpers.pyx":55
+/* "pydive/helpers.pyx":55
  *     return det
  * 
  * cdef void remove_col(gsl_matrix * original, gsl_matrix * out , int nrows, int ncols, int i) nogil:             # <<<<<<<<<<<<<<
@@ -2216,13 +2216,13 @@ static double __pyx_f_7helpers_determinant(gsl_matrix *__pyx_v_matrix, size_t __
  *     cdef int j
  */
 
-static void __pyx_f_7helpers_remove_col(gsl_matrix *__pyx_v_original, gsl_matrix *__pyx_v_out, int __pyx_v_nrows, int __pyx_v_ncols, int __pyx_v_i) {
+static void __pyx_f_6pydive_7helpers_remove_col(gsl_matrix *__pyx_v_original, gsl_matrix *__pyx_v_out, int __pyx_v_nrows, int __pyx_v_ncols, int __pyx_v_i) {
   int __pyx_v_j;
   gsl_matrix_view __pyx_v_original_view;
   gsl_matrix_view __pyx_v_out_small_view;
   int __pyx_t_1;
 
-  /* "helpers.pyx":61
+  /* "pydive/helpers.pyx":61
  *     cdef gsl_matrix_view  original_view
  * 
  *     if i==0:             # <<<<<<<<<<<<<<
@@ -2232,7 +2232,7 @@ static void __pyx_f_7helpers_remove_col(gsl_matrix *__pyx_v_original, gsl_matrix
   __pyx_t_1 = ((__pyx_v_i == 0) != 0);
   if (__pyx_t_1) {
 
-    /* "helpers.pyx":62
+    /* "pydive/helpers.pyx":62
  * 
  *     if i==0:
  *         original_view = gsl_matrix_submatrix(original, 0, 1, nrows, ncols-1)             # <<<<<<<<<<<<<<
@@ -2241,7 +2241,7 @@ static void __pyx_f_7helpers_remove_col(gsl_matrix *__pyx_v_original, gsl_matrix
  */
     __pyx_v_original_view = gsl_matrix_submatrix(__pyx_v_original, 0, 1, __pyx_v_nrows, (__pyx_v_ncols - 1));
 
-    /* "helpers.pyx":63
+    /* "pydive/helpers.pyx":63
  *     if i==0:
  *         original_view = gsl_matrix_submatrix(original, 0, 1, nrows, ncols-1)
  *         gsl_matrix_memcpy(out, &original_view.matrix)             # <<<<<<<<<<<<<<
@@ -2250,7 +2250,7 @@ static void __pyx_f_7helpers_remove_col(gsl_matrix *__pyx_v_original, gsl_matrix
  */
     (void)(gsl_matrix_memcpy(__pyx_v_out, (&__pyx_v_original_view.matrix)));
 
-    /* "helpers.pyx":61
+    /* "pydive/helpers.pyx":61
  *     cdef gsl_matrix_view  original_view
  * 
  *     if i==0:             # <<<<<<<<<<<<<<
@@ -2260,7 +2260,7 @@ static void __pyx_f_7helpers_remove_col(gsl_matrix *__pyx_v_original, gsl_matrix
     goto __pyx_L3;
   }
 
-  /* "helpers.pyx":64
+  /* "pydive/helpers.pyx":64
  *         original_view = gsl_matrix_submatrix(original, 0, 1, nrows, ncols-1)
  *         gsl_matrix_memcpy(out, &original_view.matrix)
  *     elif i==ncols-1:             # <<<<<<<<<<<<<<
@@ -2270,7 +2270,7 @@ static void __pyx_f_7helpers_remove_col(gsl_matrix *__pyx_v_original, gsl_matrix
   __pyx_t_1 = ((__pyx_v_i == (__pyx_v_ncols - 1)) != 0);
   if (__pyx_t_1) {
 
-    /* "helpers.pyx":65
+    /* "pydive/helpers.pyx":65
  *         gsl_matrix_memcpy(out, &original_view.matrix)
  *     elif i==ncols-1:
  *         original_view = gsl_matrix_submatrix(original, 0, 0, nrows, ncols-1)             # <<<<<<<<<<<<<<
@@ -2279,7 +2279,7 @@ static void __pyx_f_7helpers_remove_col(gsl_matrix *__pyx_v_original, gsl_matrix
  */
     __pyx_v_original_view = gsl_matrix_submatrix(__pyx_v_original, 0, 0, __pyx_v_nrows, (__pyx_v_ncols - 1));
 
-    /* "helpers.pyx":66
+    /* "pydive/helpers.pyx":66
  *     elif i==ncols-1:
  *         original_view = gsl_matrix_submatrix(original, 0, 0, nrows, ncols-1)
  *         gsl_matrix_memcpy(out, &original_view.matrix)             # <<<<<<<<<<<<<<
@@ -2288,7 +2288,7 @@ static void __pyx_f_7helpers_remove_col(gsl_matrix *__pyx_v_original, gsl_matrix
  */
     (void)(gsl_matrix_memcpy(__pyx_v_out, (&__pyx_v_original_view.matrix)));
 
-    /* "helpers.pyx":64
+    /* "pydive/helpers.pyx":64
  *         original_view = gsl_matrix_submatrix(original, 0, 1, nrows, ncols-1)
  *         gsl_matrix_memcpy(out, &original_view.matrix)
  *     elif i==ncols-1:             # <<<<<<<<<<<<<<
@@ -2298,7 +2298,7 @@ static void __pyx_f_7helpers_remove_col(gsl_matrix *__pyx_v_original, gsl_matrix
     goto __pyx_L3;
   }
 
-  /* "helpers.pyx":68
+  /* "pydive/helpers.pyx":68
  *         gsl_matrix_memcpy(out, &original_view.matrix)
  *     else:
  *         j=i+1             # <<<<<<<<<<<<<<
@@ -2308,7 +2308,7 @@ static void __pyx_f_7helpers_remove_col(gsl_matrix *__pyx_v_original, gsl_matrix
   /*else*/ {
     __pyx_v_j = (__pyx_v_i + 1);
 
-    /* "helpers.pyx":70
+    /* "pydive/helpers.pyx":70
  *         j=i+1
  *         # Copy to the left of i
  *         original_view = gsl_matrix_submatrix(original, 0, 0, nrows, j)             # <<<<<<<<<<<<<<
@@ -2317,7 +2317,7 @@ static void __pyx_f_7helpers_remove_col(gsl_matrix *__pyx_v_original, gsl_matrix
  */
     __pyx_v_original_view = gsl_matrix_submatrix(__pyx_v_original, 0, 0, __pyx_v_nrows, __pyx_v_j);
 
-    /* "helpers.pyx":71
+    /* "pydive/helpers.pyx":71
  *         # Copy to the left of i
  *         original_view = gsl_matrix_submatrix(original, 0, 0, nrows, j)
  *         out_small_view = gsl_matrix_submatrix(out, 0, 0, nrows, j)             # <<<<<<<<<<<<<<
@@ -2326,7 +2326,7 @@ static void __pyx_f_7helpers_remove_col(gsl_matrix *__pyx_v_original, gsl_matrix
  */
     __pyx_v_out_small_view = gsl_matrix_submatrix(__pyx_v_out, 0, 0, __pyx_v_nrows, __pyx_v_j);
 
-    /* "helpers.pyx":72
+    /* "pydive/helpers.pyx":72
  *         original_view = gsl_matrix_submatrix(original, 0, 0, nrows, j)
  *         out_small_view = gsl_matrix_submatrix(out, 0, 0, nrows, j)
  *         gsl_matrix_memcpy(&out_small_view.matrix, &original_view.matrix)             # <<<<<<<<<<<<<<
@@ -2335,7 +2335,7 @@ static void __pyx_f_7helpers_remove_col(gsl_matrix *__pyx_v_original, gsl_matrix
  */
     (void)(gsl_matrix_memcpy((&__pyx_v_out_small_view.matrix), (&__pyx_v_original_view.matrix)));
 
-    /* "helpers.pyx":74
+    /* "pydive/helpers.pyx":74
  *         gsl_matrix_memcpy(&out_small_view.matrix, &original_view.matrix)
  *         # Copy to the right of i
  *         original_view = gsl_matrix_submatrix(original, 0, j, nrows, ncols-j)             # <<<<<<<<<<<<<<
@@ -2344,7 +2344,7 @@ static void __pyx_f_7helpers_remove_col(gsl_matrix *__pyx_v_original, gsl_matrix
  */
     __pyx_v_original_view = gsl_matrix_submatrix(__pyx_v_original, 0, __pyx_v_j, __pyx_v_nrows, (__pyx_v_ncols - __pyx_v_j));
 
-    /* "helpers.pyx":75
+    /* "pydive/helpers.pyx":75
  *         # Copy to the right of i
  *         original_view = gsl_matrix_submatrix(original, 0, j, nrows, ncols-j)
  *         out_small_view = gsl_matrix_submatrix(out, 0, j-1, nrows, ncols-j)             # <<<<<<<<<<<<<<
@@ -2353,7 +2353,7 @@ static void __pyx_f_7helpers_remove_col(gsl_matrix *__pyx_v_original, gsl_matrix
  */
     __pyx_v_out_small_view = gsl_matrix_submatrix(__pyx_v_out, 0, (__pyx_v_j - 1), __pyx_v_nrows, (__pyx_v_ncols - __pyx_v_j));
 
-    /* "helpers.pyx":76
+    /* "pydive/helpers.pyx":76
  *         original_view = gsl_matrix_submatrix(original, 0, j, nrows, ncols-j)
  *         out_small_view = gsl_matrix_submatrix(out, 0, j-1, nrows, ncols-j)
  *         gsl_matrix_memcpy(&out_small_view.matrix, &original_view.matrix)             # <<<<<<<<<<<<<<
@@ -2364,7 +2364,7 @@ static void __pyx_f_7helpers_remove_col(gsl_matrix *__pyx_v_original, gsl_matrix
   }
   __pyx_L3:;
 
-  /* "helpers.pyx":55
+  /* "pydive/helpers.pyx":55
  *     return det
  * 
  * cdef void remove_col(gsl_matrix * original, gsl_matrix * out , int nrows, int ncols, int i) nogil:             # <<<<<<<<<<<<<<
@@ -2375,7 +2375,7 @@ static void __pyx_f_7helpers_remove_col(gsl_matrix *__pyx_v_original, gsl_matrix
   /* function exit code */
 }
 
-/* "helpers.pyx":79
+/* "pydive/helpers.pyx":79
  * 
  * @cython.boundscheck(False)
  * cdef void circumsphere(double[:,:] vertices, double[:] output) nogil:             # <<<<<<<<<<<<<<
@@ -2383,7 +2383,7 @@ static void __pyx_f_7helpers_remove_col(gsl_matrix *__pyx_v_original, gsl_matrix
  *     cdef gsl_matrix * D_mat = gsl_matrix_alloc(4, 5)
  */
 
-static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, __Pyx_memviewslice __pyx_v_output) {
+static void __pyx_f_6pydive_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, __Pyx_memviewslice __pyx_v_output) {
   gsl_matrix *__pyx_v_D_mat;
   gsl_matrix *__pyx_v_dummy_mat;
   double *__pyx_v_dets;
@@ -2403,7 +2403,7 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
 
-  /* "helpers.pyx":81
+  /* "pydive/helpers.pyx":81
  * cdef void circumsphere(double[:,:] vertices, double[:] output) nogil:
  * 
  *     cdef gsl_matrix * D_mat = gsl_matrix_alloc(4, 5)             # <<<<<<<<<<<<<<
@@ -2412,7 +2412,7 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
  */
   __pyx_v_D_mat = gsl_matrix_alloc(4, 5);
 
-  /* "helpers.pyx":82
+  /* "pydive/helpers.pyx":82
  * 
  *     cdef gsl_matrix * D_mat = gsl_matrix_alloc(4, 5)
  *     cdef gsl_matrix * dummy_mat = gsl_matrix_alloc(4, 4)             # <<<<<<<<<<<<<<
@@ -2421,7 +2421,7 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
  */
   __pyx_v_dummy_mat = gsl_matrix_alloc(4, 4);
 
-  /* "helpers.pyx":83
+  /* "pydive/helpers.pyx":83
  *     cdef gsl_matrix * D_mat = gsl_matrix_alloc(4, 5)
  *     cdef gsl_matrix * dummy_mat = gsl_matrix_alloc(4, 4)
  *     cdef double * dets = <double *> malloc(5 * sizeof(double))             # <<<<<<<<<<<<<<
@@ -2430,7 +2430,7 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
  */
   __pyx_v_dets = ((double *)malloc((5 * (sizeof(double)))));
 
-  /* "helpers.pyx":90
+  /* "pydive/helpers.pyx":90
  * 
  *     # create matrix a
  *     for i in range(4):             # <<<<<<<<<<<<<<
@@ -2440,7 +2440,7 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
   for (__pyx_t_1 = 0; __pyx_t_1 < 4; __pyx_t_1+=1) {
     __pyx_v_i = __pyx_t_1;
 
-    /* "helpers.pyx":91
+    /* "pydive/helpers.pyx":91
  *     # create matrix a
  *     for i in range(4):
  *         sq=0             # <<<<<<<<<<<<<<
@@ -2449,7 +2449,7 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
  */
     __pyx_v_sq = 0.0;
 
-    /* "helpers.pyx":92
+    /* "pydive/helpers.pyx":92
  *     for i in range(4):
  *         sq=0
  *         for j in range(3):             # <<<<<<<<<<<<<<
@@ -2459,7 +2459,7 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
     for (__pyx_t_2 = 0; __pyx_t_2 < 3; __pyx_t_2+=1) {
       __pyx_v_j = __pyx_t_2;
 
-      /* "helpers.pyx":93
+      /* "pydive/helpers.pyx":93
  *         sq=0
  *         for j in range(3):
  *             elem = vertices[i,j]             # <<<<<<<<<<<<<<
@@ -2472,7 +2472,7 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
       if (__pyx_t_4 < 0) __pyx_t_4 += __pyx_v_vertices.shape[1];
       __pyx_v_elem = (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_vertices.data + __pyx_t_3 * __pyx_v_vertices.strides[0]) ) + __pyx_t_4 * __pyx_v_vertices.strides[1]) )));
 
-      /* "helpers.pyx":94
+      /* "pydive/helpers.pyx":94
  *         for j in range(3):
  *             elem = vertices[i,j]
  *             gsl_matrix_set(D_mat, i, j+1, elem)             # <<<<<<<<<<<<<<
@@ -2481,7 +2481,7 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
  */
       gsl_matrix_set(__pyx_v_D_mat, __pyx_v_i, (__pyx_v_j + 1), __pyx_v_elem);
 
-      /* "helpers.pyx":95
+      /* "pydive/helpers.pyx":95
  *             elem = vertices[i,j]
  *             gsl_matrix_set(D_mat, i, j+1, elem)
  *             sq+=elem*elem             # <<<<<<<<<<<<<<
@@ -2491,7 +2491,7 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
       __pyx_v_sq = (__pyx_v_sq + (__pyx_v_elem * __pyx_v_elem));
     }
 
-    /* "helpers.pyx":96
+    /* "pydive/helpers.pyx":96
  *             gsl_matrix_set(D_mat, i, j+1, elem)
  *             sq+=elem*elem
  *         gsl_matrix_set(D_mat, i, 4, 1)             # <<<<<<<<<<<<<<
@@ -2500,7 +2500,7 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
  */
     gsl_matrix_set(__pyx_v_D_mat, __pyx_v_i, 4, 1.0);
 
-    /* "helpers.pyx":97
+    /* "pydive/helpers.pyx":97
  *             sq+=elem*elem
  *         gsl_matrix_set(D_mat, i, 4, 1)
  *         gsl_matrix_set(D_mat, i, 0, sq)             # <<<<<<<<<<<<<<
@@ -2510,7 +2510,7 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
     gsl_matrix_set(__pyx_v_D_mat, __pyx_v_i, 0, __pyx_v_sq);
   }
 
-  /* "helpers.pyx":101
+  /* "pydive/helpers.pyx":101
  * 
  * 
  *     for i in range(5):             # <<<<<<<<<<<<<<
@@ -2520,26 +2520,26 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
   for (__pyx_t_1 = 0; __pyx_t_1 < 5; __pyx_t_1+=1) {
     __pyx_v_i = __pyx_t_1;
 
-    /* "helpers.pyx":102
+    /* "pydive/helpers.pyx":102
  * 
  *     for i in range(5):
  *         remove_col(D_mat, dummy_mat, 4, 5, i)             # <<<<<<<<<<<<<<
  *         dets[i] = determinant(dummy_mat, 4)
  *         #printf("%lf ", dets[i])
  */
-    __pyx_f_7helpers_remove_col(__pyx_v_D_mat, __pyx_v_dummy_mat, 4, 5, __pyx_v_i);
+    __pyx_f_6pydive_7helpers_remove_col(__pyx_v_D_mat, __pyx_v_dummy_mat, 4, 5, __pyx_v_i);
 
-    /* "helpers.pyx":103
+    /* "pydive/helpers.pyx":103
  *     for i in range(5):
  *         remove_col(D_mat, dummy_mat, 4, 5, i)
  *         dets[i] = determinant(dummy_mat, 4)             # <<<<<<<<<<<<<<
  *         #printf("%lf ", dets[i])
  *     #printf("\n")
  */
-    (__pyx_v_dets[__pyx_v_i]) = __pyx_f_7helpers_determinant(__pyx_v_dummy_mat, 4);
+    (__pyx_v_dets[__pyx_v_i]) = __pyx_f_6pydive_7helpers_determinant(__pyx_v_dummy_mat, 4);
   }
 
-  /* "helpers.pyx":106
+  /* "pydive/helpers.pyx":106
  *         #printf("%lf ", dets[i])
  *     #printf("\n")
  *     dets[2]*=-1             # <<<<<<<<<<<<<<
@@ -2549,7 +2549,7 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
   __pyx_t_5 = 2;
   (__pyx_v_dets[__pyx_t_5]) = ((__pyx_v_dets[__pyx_t_5]) * -1.0);
 
-  /* "helpers.pyx":108
+  /* "pydive/helpers.pyx":108
  *     dets[2]*=-1
  * 
  *     gsl_matrix_free(dummy_mat)             # <<<<<<<<<<<<<<
@@ -2558,7 +2558,7 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
  */
   gsl_matrix_free(__pyx_v_dummy_mat);
 
-  /* "helpers.pyx":109
+  /* "pydive/helpers.pyx":109
  * 
  *     gsl_matrix_free(dummy_mat)
  *     gsl_matrix_free(D_mat)             # <<<<<<<<<<<<<<
@@ -2567,7 +2567,7 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
  */
   gsl_matrix_free(__pyx_v_D_mat);
 
-  /* "helpers.pyx":110
+  /* "pydive/helpers.pyx":110
  *     gsl_matrix_free(dummy_mat)
  *     gsl_matrix_free(D_mat)
  *     sq=0             # <<<<<<<<<<<<<<
@@ -2576,7 +2576,7 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
  */
   __pyx_v_sq = 0.0;
 
-  /* "helpers.pyx":111
+  /* "pydive/helpers.pyx":111
  *     gsl_matrix_free(D_mat)
  *     sq=0
  *     for i in range(3):             # <<<<<<<<<<<<<<
@@ -2586,7 +2586,7 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
   for (__pyx_t_1 = 0; __pyx_t_1 < 3; __pyx_t_1+=1) {
     __pyx_v_i = __pyx_t_1;
 
-    /* "helpers.pyx":112
+    /* "pydive/helpers.pyx":112
  *     sq=0
  *     for i in range(3):
  *         output[i] = dets[i+1]/(2*dets[0])             # <<<<<<<<<<<<<<
@@ -2609,7 +2609,7 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
     if (__pyx_t_4 < 0) __pyx_t_4 += __pyx_v_output.shape[0];
     *((double *) ( /* dim=0 */ (__pyx_v_output.data + __pyx_t_4 * __pyx_v_output.strides[0]) )) = (__pyx_t_6 / __pyx_t_7);
 
-    /* "helpers.pyx":113
+    /* "pydive/helpers.pyx":113
  *     for i in range(3):
  *         output[i] = dets[i+1]/(2*dets[0])
  *         sq+=dets[i+1]*dets[i+1]             # <<<<<<<<<<<<<<
@@ -2619,7 +2619,7 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
     __pyx_v_sq = (__pyx_v_sq + ((__pyx_v_dets[(__pyx_v_i + 1)]) * (__pyx_v_dets[(__pyx_v_i + 1)])));
   }
 
-  /* "helpers.pyx":114
+  /* "pydive/helpers.pyx":114
  *         output[i] = dets[i+1]/(2*dets[0])
  *         sq+=dets[i+1]*dets[i+1]
  *     if dets[0] !=0 :             # <<<<<<<<<<<<<<
@@ -2629,7 +2629,7 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
   __pyx_t_8 = (((__pyx_v_dets[0]) != 0.0) != 0);
   if (__pyx_t_8) {
 
-    /* "helpers.pyx":115
+    /* "pydive/helpers.pyx":115
  *         sq+=dets[i+1]*dets[i+1]
  *     if dets[0] !=0 :
  *         output[3] = sqrt((sq-4*dets[0]*dets[4]) / (4 * dets[0] * dets[0]) )             # <<<<<<<<<<<<<<
@@ -2652,7 +2652,7 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
     if (__pyx_t_4 < 0) __pyx_t_4 += __pyx_v_output.shape[0];
     *((double *) ( /* dim=0 */ (__pyx_v_output.data + __pyx_t_4 * __pyx_v_output.strides[0]) )) = sqrt((__pyx_t_7 / __pyx_t_6));
 
-    /* "helpers.pyx":114
+    /* "pydive/helpers.pyx":114
  *         output[i] = dets[i+1]/(2*dets[0])
  *         sq+=dets[i+1]*dets[i+1]
  *     if dets[0] !=0 :             # <<<<<<<<<<<<<<
@@ -2662,7 +2662,7 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
     goto __pyx_L11;
   }
 
-  /* "helpers.pyx":117
+  /* "pydive/helpers.pyx":117
  *         output[3] = sqrt((sq-4*dets[0]*dets[4]) / (4 * dets[0] * dets[0]) )
  *     else:
  *         output[3]=0             # <<<<<<<<<<<<<<
@@ -2676,7 +2676,7 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
   }
   __pyx_L11:;
 
-  /* "helpers.pyx":119
+  /* "pydive/helpers.pyx":119
  *         output[3]=0
  * 
  *     free(dets)             # <<<<<<<<<<<<<<
@@ -2685,7 +2685,7 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
  */
   free(__pyx_v_dets);
 
-  /* "helpers.pyx":79
+  /* "pydive/helpers.pyx":79
  * 
  * @cython.boundscheck(False)
  * cdef void circumsphere(double[:,:] vertices, double[:] output) nogil:             # <<<<<<<<<<<<<<
@@ -2696,11 +2696,11 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
   /* function exit code */
   goto __pyx_L0;
   __pyx_L1_error:;
-  __Pyx_WriteUnraisable("helpers.circumsphere", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 1);
+  __Pyx_WriteUnraisable("pydive.helpers.circumsphere", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 1);
   __pyx_L0:;
 }
 
-/* "helpers.pyx":124
+/* "pydive/helpers.pyx":124
  * 
  * 
  * def single_circumsphere(double[:,:] vertices):             # <<<<<<<<<<<<<<
@@ -2709,9 +2709,9 @@ static void __pyx_f_7helpers_circumsphere(__Pyx_memviewslice __pyx_v_vertices, _
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7helpers_1single_circumsphere(PyObject *__pyx_self, PyObject *__pyx_arg_vertices); /*proto*/
-static PyMethodDef __pyx_mdef_7helpers_1single_circumsphere = {"single_circumsphere", (PyCFunction)__pyx_pw_7helpers_1single_circumsphere, METH_O, 0};
-static PyObject *__pyx_pw_7helpers_1single_circumsphere(PyObject *__pyx_self, PyObject *__pyx_arg_vertices) {
+static PyObject *__pyx_pw_6pydive_7helpers_1single_circumsphere(PyObject *__pyx_self, PyObject *__pyx_arg_vertices); /*proto*/
+static PyMethodDef __pyx_mdef_6pydive_7helpers_1single_circumsphere = {"single_circumsphere", (PyCFunction)__pyx_pw_6pydive_7helpers_1single_circumsphere, METH_O, 0};
+static PyObject *__pyx_pw_6pydive_7helpers_1single_circumsphere(PyObject *__pyx_self, PyObject *__pyx_arg_vertices) {
   __Pyx_memviewslice __pyx_v_vertices = { 0, 0, { 0 }, { 0 }, { 0 } };
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
@@ -2724,18 +2724,18 @@ static PyObject *__pyx_pw_7helpers_1single_circumsphere(PyObject *__pyx_self, Py
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
-  __Pyx_AddTraceback("helpers.single_circumsphere", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("pydive.helpers.single_circumsphere", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_7helpers_single_circumsphere(__pyx_self, __pyx_v_vertices);
+  __pyx_r = __pyx_pf_6pydive_7helpers_single_circumsphere(__pyx_self, __pyx_v_vertices);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7helpers_single_circumsphere(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_vertices) {
+static PyObject *__pyx_pf_6pydive_7helpers_single_circumsphere(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_vertices) {
   PyObject *__pyx_v_out = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -2749,7 +2749,7 @@ static PyObject *__pyx_pf_7helpers_single_circumsphere(CYTHON_UNUSED PyObject *_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("single_circumsphere", 0);
 
-  /* "helpers.pyx":126
+  /* "pydive/helpers.pyx":126
  * def single_circumsphere(double[:,:] vertices):
  * 
  *     out = np.empty(4, dtype=np.double)             # <<<<<<<<<<<<<<
@@ -2777,7 +2777,7 @@ static PyObject *__pyx_pf_7helpers_single_circumsphere(CYTHON_UNUSED PyObject *_
   __pyx_v_out = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "helpers.pyx":127
+  /* "pydive/helpers.pyx":127
  * 
  *     out = np.empty(4, dtype=np.double)
  *     circumsphere(vertices, out)             # <<<<<<<<<<<<<<
@@ -2785,12 +2785,12 @@ static PyObject *__pyx_pf_7helpers_single_circumsphere(CYTHON_UNUSED PyObject *_
  * 
  */
   __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_v_out, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 127, __pyx_L1_error)
-  __pyx_f_7helpers_circumsphere(__pyx_v_vertices, __pyx_t_5);
+  __pyx_f_6pydive_7helpers_circumsphere(__pyx_v_vertices, __pyx_t_5);
   __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
 
-  /* "helpers.pyx":128
+  /* "pydive/helpers.pyx":128
  *     out = np.empty(4, dtype=np.double)
  *     circumsphere(vertices, out)
  *     return out             # <<<<<<<<<<<<<<
@@ -2802,7 +2802,7 @@ static PyObject *__pyx_pf_7helpers_single_circumsphere(CYTHON_UNUSED PyObject *_
   __pyx_r = __pyx_v_out;
   goto __pyx_L0;
 
-  /* "helpers.pyx":124
+  /* "pydive/helpers.pyx":124
  * 
  * 
  * def single_circumsphere(double[:,:] vertices):             # <<<<<<<<<<<<<<
@@ -2817,7 +2817,7 @@ static PyObject *__pyx_pf_7helpers_single_circumsphere(CYTHON_UNUSED PyObject *_
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
-  __Pyx_AddTraceback("helpers.single_circumsphere", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("pydive.helpers.single_circumsphere", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_vertices, 1);
@@ -2827,7 +2827,7 @@ static PyObject *__pyx_pf_7helpers_single_circumsphere(CYTHON_UNUSED PyObject *_
   return __pyx_r;
 }
 
-/* "helpers.pyx":130
+/* "pydive/helpers.pyx":130
  *     return out
  * 
  * def get_void_catalog(double[:,:,:] vertices, double[:,:] output, int n_simplices):             # <<<<<<<<<<<<<<
@@ -2836,9 +2836,9 @@ static PyObject *__pyx_pf_7helpers_single_circumsphere(CYTHON_UNUSED PyObject *_
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7helpers_3get_void_catalog(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_7helpers_3get_void_catalog = {"get_void_catalog", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_7helpers_3get_void_catalog, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_7helpers_3get_void_catalog(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_6pydive_7helpers_3get_void_catalog(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_6pydive_7helpers_3get_void_catalog = {"get_void_catalog", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_6pydive_7helpers_3get_void_catalog, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_6pydive_7helpers_3get_void_catalog(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_vertices = { 0, 0, { 0 }, { 0 }, { 0 } };
   __Pyx_memviewslice __pyx_v_output = { 0, 0, { 0 }, { 0 }, { 0 } };
   int __pyx_v_n_simplices;
@@ -2900,18 +2900,18 @@ static PyObject *__pyx_pw_7helpers_3get_void_catalog(PyObject *__pyx_self, PyObj
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("get_void_catalog", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 130, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("helpers.get_void_catalog", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("pydive.helpers.get_void_catalog", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_7helpers_2get_void_catalog(__pyx_self, __pyx_v_vertices, __pyx_v_output, __pyx_v_n_simplices);
+  __pyx_r = __pyx_pf_6pydive_7helpers_2get_void_catalog(__pyx_self, __pyx_v_vertices, __pyx_v_output, __pyx_v_n_simplices);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7helpers_2get_void_catalog(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_vertices, __Pyx_memviewslice __pyx_v_output, int __pyx_v_n_simplices) {
+static PyObject *__pyx_pf_6pydive_7helpers_2get_void_catalog(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_vertices, __Pyx_memviewslice __pyx_v_output, int __pyx_v_n_simplices) {
   Py_ssize_t __pyx_v_i;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -2925,7 +2925,7 @@ static PyObject *__pyx_pf_7helpers_2get_void_catalog(CYTHON_UNUSED PyObject *__p
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_void_catalog", 0);
 
-  /* "helpers.pyx":134
+  /* "pydive/helpers.pyx":134
  *     cdef Py_ssize_t i
  * 
  *     for i in range(n_simplices):             # <<<<<<<<<<<<<<
@@ -2937,7 +2937,7 @@ static PyObject *__pyx_pf_7helpers_2get_void_catalog(CYTHON_UNUSED PyObject *__p
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "helpers.pyx":136
+    /* "pydive/helpers.pyx":136
  *     for i in range(n_simplices):
  * 
  *         circumsphere(vertices[i, :, :], output[i, :])             # <<<<<<<<<<<<<<
@@ -2990,7 +2990,7 @@ __pyx_t_5.shape[0] = __pyx_v_output.shape[1];
 __pyx_t_5.strides[0] = __pyx_v_output.strides[1];
     __pyx_t_5.suboffsets[0] = -1;
 
-__pyx_f_7helpers_circumsphere(__pyx_t_4, __pyx_t_5);
+__pyx_f_6pydive_7helpers_circumsphere(__pyx_t_4, __pyx_t_5);
     __PYX_XDEC_MEMVIEW(&__pyx_t_4, 1);
     __pyx_t_4.memview = NULL;
     __pyx_t_4.data = NULL;
@@ -2999,7 +2999,7 @@ __pyx_f_7helpers_circumsphere(__pyx_t_4, __pyx_t_5);
     __pyx_t_5.data = NULL;
   }
 
-  /* "helpers.pyx":130
+  /* "pydive/helpers.pyx":130
  *     return out
  * 
  * def get_void_catalog(double[:,:,:] vertices, double[:,:] output, int n_simplices):             # <<<<<<<<<<<<<<
@@ -3013,7 +3013,7 @@ __pyx_f_7helpers_circumsphere(__pyx_t_4, __pyx_t_5);
   __pyx_L1_error:;
   __PYX_XDEC_MEMVIEW(&__pyx_t_4, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
-  __Pyx_AddTraceback("helpers.get_void_catalog", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("pydive.helpers.get_void_catalog", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_vertices, 1);
@@ -3023,7 +3023,7 @@ __pyx_f_7helpers_circumsphere(__pyx_t_4, __pyx_t_5);
   return __pyx_r;
 }
 
-/* "helpers.pyx":138
+/* "pydive/helpers.pyx":138
  *         circumsphere(vertices[i, :, :], output[i, :])
  * 
  * def get_void_catalog_parallel(double[:,:,:] vertices, double[:,:] output, int n_simplices):             # <<<<<<<<<<<<<<
@@ -3032,9 +3032,9 @@ __pyx_f_7helpers_circumsphere(__pyx_t_4, __pyx_t_5);
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7helpers_5get_void_catalog_parallel(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_7helpers_5get_void_catalog_parallel = {"get_void_catalog_parallel", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_7helpers_5get_void_catalog_parallel, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_7helpers_5get_void_catalog_parallel(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_6pydive_7helpers_5get_void_catalog_parallel(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_6pydive_7helpers_5get_void_catalog_parallel = {"get_void_catalog_parallel", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_6pydive_7helpers_5get_void_catalog_parallel, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_6pydive_7helpers_5get_void_catalog_parallel(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_vertices = { 0, 0, { 0 }, { 0 }, { 0 } };
   __Pyx_memviewslice __pyx_v_output = { 0, 0, { 0 }, { 0 }, { 0 } };
   CYTHON_UNUSED int __pyx_v_n_simplices;
@@ -3096,18 +3096,18 @@ static PyObject *__pyx_pw_7helpers_5get_void_catalog_parallel(PyObject *__pyx_se
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("get_void_catalog_parallel", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 138, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("helpers.get_void_catalog_parallel", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("pydive.helpers.get_void_catalog_parallel", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_7helpers_4get_void_catalog_parallel(__pyx_self, __pyx_v_vertices, __pyx_v_output, __pyx_v_n_simplices);
+  __pyx_r = __pyx_pf_6pydive_7helpers_4get_void_catalog_parallel(__pyx_self, __pyx_v_vertices, __pyx_v_output, __pyx_v_n_simplices);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7helpers_4get_void_catalog_parallel(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_vertices, __Pyx_memviewslice __pyx_v_output, CYTHON_UNUSED int __pyx_v_n_simplices) {
+static PyObject *__pyx_pf_6pydive_7helpers_4get_void_catalog_parallel(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_vertices, __Pyx_memviewslice __pyx_v_output, CYTHON_UNUSED int __pyx_v_n_simplices) {
   Py_ssize_t __pyx_v_i;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -3121,7 +3121,7 @@ static PyObject *__pyx_pf_7helpers_4get_void_catalog_parallel(CYTHON_UNUSED PyOb
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_void_catalog_parallel", 0);
 
-  /* "helpers.pyx":142
+  /* "pydive/helpers.pyx":142
  *     cdef Py_ssize_t i
  * 
  *     for i in prange(n_simplices, nogil=True):             # <<<<<<<<<<<<<<
@@ -3170,7 +3170,7 @@ static PyObject *__pyx_pf_7helpers_4get_void_catalog_parallel(CYTHON_UNUSED PyOb
                         {
                             __pyx_v_i = (Py_ssize_t)(0 + 1 * __pyx_t_2);
 
-                            /* "helpers.pyx":144
+                            /* "pydive/helpers.pyx":144
  *     for i in prange(n_simplices, nogil=True):
  * 
  *         circumsphere(vertices[i, :, :], output[i, :])             # <<<<<<<<<<<<<<
@@ -3235,7 +3235,7 @@ __pyx_t_5.shape[0] = __pyx_v_output.shape[1];
 __pyx_t_5.strides[0] = __pyx_v_output.strides[1];
     __pyx_t_5.suboffsets[0] = -1;
 
-__pyx_f_7helpers_circumsphere(__pyx_t_4, __pyx_t_5);
+__pyx_f_6pydive_7helpers_circumsphere(__pyx_t_4, __pyx_t_5);
                             __PYX_XDEC_MEMVIEW(&__pyx_t_4, 0);
                             __pyx_t_4.memview = NULL;
                             __pyx_t_4.data = NULL;
@@ -3325,7 +3325,7 @@ __pyx_f_7helpers_circumsphere(__pyx_t_4, __pyx_t_5);
         #endif
       }
 
-      /* "helpers.pyx":142
+      /* "pydive/helpers.pyx":142
  *     cdef Py_ssize_t i
  * 
  *     for i in prange(n_simplices, nogil=True):             # <<<<<<<<<<<<<<
@@ -3351,7 +3351,7 @@ __pyx_f_7helpers_circumsphere(__pyx_t_4, __pyx_t_5);
       }
   }
 
-  /* "helpers.pyx":138
+  /* "pydive/helpers.pyx":138
  *         circumsphere(vertices[i, :, :], output[i, :])
  * 
  * def get_void_catalog_parallel(double[:,:,:] vertices, double[:,:] output, int n_simplices):             # <<<<<<<<<<<<<<
@@ -3365,7 +3365,7 @@ __pyx_f_7helpers_circumsphere(__pyx_t_4, __pyx_t_5);
   __pyx_L1_error:;
   __PYX_XDEC_MEMVIEW(&__pyx_t_4, 1);
   __PYX_XDEC_MEMVIEW(&__pyx_t_5, 1);
-  __Pyx_AddTraceback("helpers.get_void_catalog_parallel", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("pydive.helpers.get_void_catalog_parallel", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __PYX_XDEC_MEMVIEW(&__pyx_v_vertices, 1);
@@ -3375,7 +3375,7 @@ __pyx_f_7helpers_circumsphere(__pyx_t_4, __pyx_t_5);
   return __pyx_r;
 }
 
-/* "helpers.pyx":146
+/* "pydive/helpers.pyx":146
  *         circumsphere(vertices[i, :, :], output[i, :])
  * 
  * def c_ascii_writer(double [:,:] oarr, int n_elem, str oname):             # <<<<<<<<<<<<<<
@@ -3384,9 +3384,9 @@ __pyx_f_7helpers_circumsphere(__pyx_t_4, __pyx_t_5);
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7helpers_7c_ascii_writer(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_7helpers_7c_ascii_writer = {"c_ascii_writer", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_7helpers_7c_ascii_writer, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_7helpers_7c_ascii_writer(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_6pydive_7helpers_7c_ascii_writer(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_6pydive_7helpers_7c_ascii_writer = {"c_ascii_writer", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_6pydive_7helpers_7c_ascii_writer, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_6pydive_7helpers_7c_ascii_writer(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   __Pyx_memviewslice __pyx_v_oarr = { 0, 0, { 0 }, { 0 }, { 0 } };
   int __pyx_v_n_elem;
   PyObject *__pyx_v_oname = 0;
@@ -3448,12 +3448,12 @@ static PyObject *__pyx_pw_7helpers_7c_ascii_writer(PyObject *__pyx_self, PyObjec
   __pyx_L5_argtuple_error:;
   __Pyx_RaiseArgtupleInvalid("c_ascii_writer", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 146, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("helpers.c_ascii_writer", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("pydive.helpers.c_ascii_writer", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_oname), (&PyString_Type), 1, "oname", 1))) __PYX_ERR(0, 146, __pyx_L1_error)
-  __pyx_r = __pyx_pf_7helpers_6c_ascii_writer(__pyx_self, __pyx_v_oarr, __pyx_v_n_elem, __pyx_v_oname);
+  __pyx_r = __pyx_pf_6pydive_7helpers_6c_ascii_writer(__pyx_self, __pyx_v_oarr, __pyx_v_n_elem, __pyx_v_oname);
 
   /* function exit code */
   goto __pyx_L0;
@@ -3464,7 +3464,7 @@ static PyObject *__pyx_pw_7helpers_7c_ascii_writer(PyObject *__pyx_self, PyObjec
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7helpers_6c_ascii_writer(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_oarr, int __pyx_v_n_elem, PyObject *__pyx_v_oname) {
+static PyObject *__pyx_pf_6pydive_7helpers_6c_ascii_writer(CYTHON_UNUSED PyObject *__pyx_self, __Pyx_memviewslice __pyx_v_oarr, int __pyx_v_n_elem, PyObject *__pyx_v_oname) {
   FILE *__pyx_v_fp;
   PyObject *__pyx_v_oname_bytes = 0;
   char *__pyx_v_oname_c;
@@ -3490,7 +3490,7 @@ static PyObject *__pyx_pf_7helpers_6c_ascii_writer(CYTHON_UNUSED PyObject *__pyx
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("c_ascii_writer", 0);
 
-  /* "helpers.pyx":149
+  /* "pydive/helpers.pyx":149
  * 
  *     cdef FILE *fp
  *     cdef bytes oname_bytes = oname.encode()             # <<<<<<<<<<<<<<
@@ -3503,7 +3503,7 @@ static PyObject *__pyx_pf_7helpers_6c_ascii_writer(CYTHON_UNUSED PyObject *__pyx
   __pyx_v_oname_bytes = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "helpers.pyx":150
+  /* "pydive/helpers.pyx":150
  *     cdef FILE *fp
  *     cdef bytes oname_bytes = oname.encode()
  *     cdef char* oname_c = oname_bytes             # <<<<<<<<<<<<<<
@@ -3517,7 +3517,7 @@ static PyObject *__pyx_pf_7helpers_6c_ascii_writer(CYTHON_UNUSED PyObject *__pyx
   __pyx_t_2 = __Pyx_PyBytes_AsWritableString(__pyx_v_oname_bytes); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) __PYX_ERR(0, 150, __pyx_L1_error)
   __pyx_v_oname_c = __pyx_t_2;
 
-  /* "helpers.pyx":152
+  /* "pydive/helpers.pyx":152
  *     cdef char* oname_c = oname_bytes
  * 
  *     fp = fopen(oname_c, "w")             # <<<<<<<<<<<<<<
@@ -3526,7 +3526,7 @@ static PyObject *__pyx_pf_7helpers_6c_ascii_writer(CYTHON_UNUSED PyObject *__pyx
  */
   __pyx_v_fp = fopen(__pyx_v_oname_c, ((char const *)"w"));
 
-  /* "helpers.pyx":156
+  /* "pydive/helpers.pyx":156
  *     cdef Py_ssize_t i
  * 
  *     for i in range(n_elem):             # <<<<<<<<<<<<<<
@@ -3538,7 +3538,7 @@ static PyObject *__pyx_pf_7helpers_6c_ascii_writer(CYTHON_UNUSED PyObject *__pyx
   for (__pyx_t_5 = 0; __pyx_t_5 < __pyx_t_4; __pyx_t_5+=1) {
     __pyx_v_i = __pyx_t_5;
 
-    /* "helpers.pyx":157
+    /* "pydive/helpers.pyx":157
  * 
  *     for i in range(n_elem):
  *         fprintf(fp, "%lf %lf %lf %lf\n", oarr[i,0], oarr[i,1], oarr[i,2], oarr[i,3])             # <<<<<<<<<<<<<<
@@ -3608,14 +3608,14 @@ static PyObject *__pyx_pf_7helpers_6c_ascii_writer(CYTHON_UNUSED PyObject *__pyx
     (void)(fprintf(__pyx_v_fp, ((char const *)"%lf %lf %lf %lf\n"), (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_oarr.data + __pyx_t_6 * __pyx_v_oarr.strides[0]) ) + __pyx_t_7 * __pyx_v_oarr.strides[1]) ))), (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_oarr.data + __pyx_t_9 * __pyx_v_oarr.strides[0]) ) + __pyx_t_10 * __pyx_v_oarr.strides[1]) ))), (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_oarr.data + __pyx_t_11 * __pyx_v_oarr.strides[0]) ) + __pyx_t_12 * __pyx_v_oarr.strides[1]) ))), (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_oarr.data + __pyx_t_13 * __pyx_v_oarr.strides[0]) ) + __pyx_t_14 * __pyx_v_oarr.strides[1]) )))));
   }
 
-  /* "helpers.pyx":159
+  /* "pydive/helpers.pyx":159
  *         fprintf(fp, "%lf %lf %lf %lf\n", oarr[i,0], oarr[i,1], oarr[i,2], oarr[i,3])
  * 
  *     fclose(fp)             # <<<<<<<<<<<<<<
  */
   (void)(fclose(__pyx_v_fp));
 
-  /* "helpers.pyx":146
+  /* "pydive/helpers.pyx":146
  *         circumsphere(vertices[i, :, :], output[i, :])
  * 
  * def c_ascii_writer(double [:,:] oarr, int n_elem, str oname):             # <<<<<<<<<<<<<<
@@ -3628,7 +3628,7 @@ static PyObject *__pyx_pf_7helpers_6c_ascii_writer(CYTHON_UNUSED PyObject *__pyx
   goto __pyx_L0;
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("helpers.c_ascii_writer", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("pydive.helpers.c_ascii_writer", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_oname_bytes);
@@ -16778,7 +16778,7 @@ static PyBufferProcs __pyx_tp_as_buffer_array = {
 
 static PyTypeObject __pyx_type___pyx_array = {
   PyVarObject_HEAD_INIT(0, 0)
-  "helpers.array", /*tp_name*/
+  "pydive.helpers.array", /*tp_name*/
   sizeof(struct __pyx_array_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_array, /*tp_dealloc*/
@@ -16897,7 +16897,7 @@ static PyMethodDef __pyx_methods_Enum[] = {
 
 static PyTypeObject __pyx_type___pyx_MemviewEnum = {
   PyVarObject_HEAD_INIT(0, 0)
-  "helpers.Enum", /*tp_name*/
+  "pydive.helpers.Enum", /*tp_name*/
   sizeof(struct __pyx_MemviewEnum_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_Enum, /*tp_dealloc*/
@@ -17158,7 +17158,7 @@ static PyBufferProcs __pyx_tp_as_buffer_memoryview = {
 
 static PyTypeObject __pyx_type___pyx_memoryview = {
   PyVarObject_HEAD_INIT(0, 0)
-  "helpers.memoryview", /*tp_name*/
+  "pydive.helpers.memoryview", /*tp_name*/
   sizeof(struct __pyx_memoryview_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc_memoryview, /*tp_dealloc*/
@@ -17296,7 +17296,7 @@ static struct PyGetSetDef __pyx_getsets__memoryviewslice[] = {
 
 static PyTypeObject __pyx_type___pyx_memoryviewslice = {
   PyVarObject_HEAD_INIT(0, 0)
-  "helpers._memoryviewslice", /*tp_name*/
+  "pydive.helpers._memoryviewslice", /*tp_name*/
   sizeof(struct __pyx_memoryviewslice_obj), /*tp_basicsize*/
   0, /*tp_itemsize*/
   __pyx_tp_dealloc__memoryviewslice, /*tp_dealloc*/
@@ -17466,7 +17466,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_get_void_catalog_parallel, __pyx_k_get_void_catalog_parallel, sizeof(__pyx_k_get_void_catalog_parallel), 0, 0, 1, 1},
   {&__pyx_n_s_getstate, __pyx_k_getstate, sizeof(__pyx_k_getstate), 0, 0, 1, 1},
   {&__pyx_kp_s_got_differing_extents_in_dimensi, __pyx_k_got_differing_extents_in_dimensi, sizeof(__pyx_k_got_differing_extents_in_dimensi), 0, 0, 1, 0},
-  {&__pyx_n_s_helpers, __pyx_k_helpers, sizeof(__pyx_k_helpers), 0, 0, 1, 1},
   {&__pyx_n_s_i, __pyx_k_i, sizeof(__pyx_k_i), 0, 0, 1, 1},
   {&__pyx_n_s_id, __pyx_k_id, sizeof(__pyx_k_id), 0, 0, 1, 1},
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
@@ -17493,6 +17492,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_output, __pyx_k_output, sizeof(__pyx_k_output), 0, 0, 1, 1},
   {&__pyx_n_s_pack, __pyx_k_pack, sizeof(__pyx_k_pack), 0, 0, 1, 1},
   {&__pyx_n_s_pickle, __pyx_k_pickle, sizeof(__pyx_k_pickle), 0, 0, 1, 1},
+  {&__pyx_n_s_pydive_helpers, __pyx_k_pydive_helpers, sizeof(__pyx_k_pydive_helpers), 0, 0, 1, 1},
+  {&__pyx_kp_s_pydive_helpers_pyx, __pyx_k_pydive_helpers_pyx, sizeof(__pyx_k_pydive_helpers_pyx), 0, 0, 1, 0},
   {&__pyx_n_s_pyx_PickleError, __pyx_k_pyx_PickleError, sizeof(__pyx_k_pyx_PickleError), 0, 0, 1, 1},
   {&__pyx_n_s_pyx_checksum, __pyx_k_pyx_checksum, sizeof(__pyx_k_pyx_checksum), 0, 0, 1, 1},
   {&__pyx_n_s_pyx_getbuffer, __pyx_k_pyx_getbuffer, sizeof(__pyx_k_pyx_getbuffer), 0, 0, 1, 1},
@@ -17510,7 +17511,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_shape, __pyx_k_shape, sizeof(__pyx_k_shape), 0, 0, 1, 1},
   {&__pyx_n_s_single_circumsphere, __pyx_k_single_circumsphere, sizeof(__pyx_k_single_circumsphere), 0, 0, 1, 1},
   {&__pyx_n_s_size, __pyx_k_size, sizeof(__pyx_k_size), 0, 0, 1, 1},
-  {&__pyx_kp_s_src_helpers_pyx, __pyx_k_src_helpers_pyx, sizeof(__pyx_k_src_helpers_pyx), 0, 0, 1, 0},
   {&__pyx_n_s_start, __pyx_k_start, sizeof(__pyx_k_start), 0, 0, 1, 1},
   {&__pyx_n_s_step, __pyx_k_step, sizeof(__pyx_k_step), 0, 0, 1, 1},
   {&__pyx_n_s_stop, __pyx_k_stop, sizeof(__pyx_k_stop), 0, 0, 1, 1},
@@ -17545,7 +17545,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "helpers.pyx":126
+  /* "pydive/helpers.pyx":126
  * def single_circumsphere(double[:,:] vertices):
  * 
  *     out = np.empty(4, dtype=np.double)             # <<<<<<<<<<<<<<
@@ -17748,7 +17748,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__19);
   __Pyx_GIVEREF(__pyx_tuple__19);
 
-  /* "helpers.pyx":124
+  /* "pydive/helpers.pyx":124
  * 
  * 
  * def single_circumsphere(double[:,:] vertices):             # <<<<<<<<<<<<<<
@@ -17758,9 +17758,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__20 = PyTuple_Pack(3, __pyx_n_s_vertices, __pyx_n_s_vertices, __pyx_n_s_out); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(0, 124, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__20);
   __Pyx_GIVEREF(__pyx_tuple__20);
-  __pyx_codeobj__21 = (PyObject*)__Pyx_PyCode_New(1, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__20, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_helpers_pyx, __pyx_n_s_single_circumsphere, 124, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__21)) __PYX_ERR(0, 124, __pyx_L1_error)
+  __pyx_codeobj__21 = (PyObject*)__Pyx_PyCode_New(1, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__20, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pydive_helpers_pyx, __pyx_n_s_single_circumsphere, 124, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__21)) __PYX_ERR(0, 124, __pyx_L1_error)
 
-  /* "helpers.pyx":130
+  /* "pydive/helpers.pyx":130
  *     return out
  * 
  * def get_void_catalog(double[:,:,:] vertices, double[:,:] output, int n_simplices):             # <<<<<<<<<<<<<<
@@ -17770,9 +17770,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__22 = PyTuple_Pack(4, __pyx_n_s_vertices, __pyx_n_s_output, __pyx_n_s_n_simplices, __pyx_n_s_i); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(0, 130, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__22);
   __Pyx_GIVEREF(__pyx_tuple__22);
-  __pyx_codeobj__23 = (PyObject*)__Pyx_PyCode_New(3, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__22, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_helpers_pyx, __pyx_n_s_get_void_catalog, 130, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__23)) __PYX_ERR(0, 130, __pyx_L1_error)
+  __pyx_codeobj__23 = (PyObject*)__Pyx_PyCode_New(3, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__22, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pydive_helpers_pyx, __pyx_n_s_get_void_catalog, 130, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__23)) __PYX_ERR(0, 130, __pyx_L1_error)
 
-  /* "helpers.pyx":138
+  /* "pydive/helpers.pyx":138
  *         circumsphere(vertices[i, :, :], output[i, :])
  * 
  * def get_void_catalog_parallel(double[:,:,:] vertices, double[:,:] output, int n_simplices):             # <<<<<<<<<<<<<<
@@ -17782,9 +17782,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__24 = PyTuple_Pack(4, __pyx_n_s_vertices, __pyx_n_s_output, __pyx_n_s_n_simplices, __pyx_n_s_i); if (unlikely(!__pyx_tuple__24)) __PYX_ERR(0, 138, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__24);
   __Pyx_GIVEREF(__pyx_tuple__24);
-  __pyx_codeobj__25 = (PyObject*)__Pyx_PyCode_New(3, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__24, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_helpers_pyx, __pyx_n_s_get_void_catalog_parallel, 138, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__25)) __PYX_ERR(0, 138, __pyx_L1_error)
+  __pyx_codeobj__25 = (PyObject*)__Pyx_PyCode_New(3, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__24, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pydive_helpers_pyx, __pyx_n_s_get_void_catalog_parallel, 138, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__25)) __PYX_ERR(0, 138, __pyx_L1_error)
 
-  /* "helpers.pyx":146
+  /* "pydive/helpers.pyx":146
  *         circumsphere(vertices[i, :, :], output[i, :])
  * 
  * def c_ascii_writer(double [:,:] oarr, int n_elem, str oname):             # <<<<<<<<<<<<<<
@@ -17794,7 +17794,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_tuple__26 = PyTuple_Pack(7, __pyx_n_s_oarr, __pyx_n_s_n_elem, __pyx_n_s_oname, __pyx_n_s_fp, __pyx_n_s_oname_bytes, __pyx_n_s_oname_c, __pyx_n_s_i); if (unlikely(!__pyx_tuple__26)) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__26);
   __Pyx_GIVEREF(__pyx_tuple__26);
-  __pyx_codeobj__27 = (PyObject*)__Pyx_PyCode_New(3, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__26, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_src_helpers_pyx, __pyx_n_s_c_ascii_writer, 146, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__27)) __PYX_ERR(0, 146, __pyx_L1_error)
+  __pyx_codeobj__27 = (PyObject*)__Pyx_PyCode_New(3, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__26, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pydive_helpers_pyx, __pyx_n_s_c_ascii_writer, 146, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__27)) __PYX_ERR(0, 146, __pyx_L1_error)
 
   /* "View.MemoryView":286
  *         return self.name
@@ -18188,14 +18188,14 @@ if (!__Pyx_RefNanny) {
   #if PY_MAJOR_VERSION < 3 && (__PYX_DEFAULT_STRING_ENCODING_IS_ASCII || __PYX_DEFAULT_STRING_ENCODING_IS_DEFAULT)
   if (__Pyx_init_sys_getdefaultencoding_params() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
-  if (__pyx_module_is_main_helpers) {
+  if (__pyx_module_is_main_pydive__helpers) {
     if (PyObject_SetAttr(__pyx_m, __pyx_n_s_name_2, __pyx_n_s_main) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   }
   #if PY_MAJOR_VERSION >= 3
   {
     PyObject *modules = PyImport_GetModuleDict(); if (unlikely(!modules)) __PYX_ERR(0, 1, __pyx_L1_error)
-    if (!PyDict_GetItemString(modules, "helpers")) {
-      if (unlikely(PyDict_SetItemString(modules, "helpers", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
+    if (!PyDict_GetItemString(modules, "pydive.helpers")) {
+      if (unlikely(PyDict_SetItemString(modules, "pydive.helpers", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
     }
   }
   #endif
@@ -18216,7 +18216,7 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "helpers.pyx":3
+  /* "pydive/helpers.pyx":3
  * import cython
  * from cython.parallel import prange
  * import numpy as np             # <<<<<<<<<<<<<<
@@ -18228,55 +18228,55 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) __PYX_ERR(0, 3, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "helpers.pyx":124
+  /* "pydive/helpers.pyx":124
  * 
  * 
  * def single_circumsphere(double[:,:] vertices):             # <<<<<<<<<<<<<<
  * 
  *     out = np.empty(4, dtype=np.double)
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_7helpers_1single_circumsphere, NULL, __pyx_n_s_helpers); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 124, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6pydive_7helpers_1single_circumsphere, NULL, __pyx_n_s_pydive_helpers); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 124, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_single_circumsphere, __pyx_t_1) < 0) __PYX_ERR(0, 124, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "helpers.pyx":130
+  /* "pydive/helpers.pyx":130
  *     return out
  * 
  * def get_void_catalog(double[:,:,:] vertices, double[:,:] output, int n_simplices):             # <<<<<<<<<<<<<<
  * 
  *     cdef Py_ssize_t i
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_7helpers_3get_void_catalog, NULL, __pyx_n_s_helpers); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 130, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6pydive_7helpers_3get_void_catalog, NULL, __pyx_n_s_pydive_helpers); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 130, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_get_void_catalog, __pyx_t_1) < 0) __PYX_ERR(0, 130, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "helpers.pyx":138
+  /* "pydive/helpers.pyx":138
  *         circumsphere(vertices[i, :, :], output[i, :])
  * 
  * def get_void_catalog_parallel(double[:,:,:] vertices, double[:,:] output, int n_simplices):             # <<<<<<<<<<<<<<
  * 
  *     cdef Py_ssize_t i
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_7helpers_5get_void_catalog_parallel, NULL, __pyx_n_s_helpers); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 138, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6pydive_7helpers_5get_void_catalog_parallel, NULL, __pyx_n_s_pydive_helpers); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 138, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_get_void_catalog_parallel, __pyx_t_1) < 0) __PYX_ERR(0, 138, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "helpers.pyx":146
+  /* "pydive/helpers.pyx":146
  *         circumsphere(vertices[i, :, :], output[i, :])
  * 
  * def c_ascii_writer(double [:,:] oarr, int n_elem, str oname):             # <<<<<<<<<<<<<<
  * 
  *     cdef FILE *fp
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_7helpers_7c_ascii_writer, NULL, __pyx_n_s_helpers); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 146, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6pydive_7helpers_7c_ascii_writer, NULL, __pyx_n_s_pydive_helpers); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_c_ascii_writer, __pyx_t_1) < 0) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "helpers.pyx":1
+  /* "pydive/helpers.pyx":1
  * import cython             # <<<<<<<<<<<<<<
  * from cython.parallel import prange
  * import numpy as np
@@ -18446,11 +18446,11 @@ if (!__Pyx_RefNanny) {
   __Pyx_XDECREF(__pyx_t_1);
   if (__pyx_m) {
     if (__pyx_d) {
-      __Pyx_AddTraceback("init helpers", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      __Pyx_AddTraceback("init pydive.helpers", __pyx_clineno, __pyx_lineno, __pyx_filename);
     }
     Py_CLEAR(__pyx_m);
   } else if (!PyErr_Occurred()) {
-    PyErr_SetString(PyExc_ImportError, "init helpers");
+    PyErr_SetString(PyExc_ImportError, "init pydive.helpers");
   }
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();

@@ -2,8 +2,8 @@ from setuptools import setup, Extension, find_packages
 from Cython.Build import cythonize
 import numpy
 
-myext = Extension("bin.helpers",
-                  sources=['src/helpers.pyx'],
+myext = Extension("pydive.helpers",
+                  sources=['pydive/helpers.pyx'],
                   include_dirs=[numpy.get_include(), '/usr/include'],
                   library_dirs=['/usr/lib/x86_64-linux-gnu'],
                   libraries=['m', 'gsl', 'gslcblas'],
