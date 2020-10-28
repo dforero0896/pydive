@@ -6,7 +6,7 @@ import os
 import sys
 import argparse
 
-def galaxies_to_voids(points, r_min, r_max, box_size, is_box=False, cpy_range=80):
+def galaxies_to_voids(points, r_min=0, r_max=99999, box_size=2500, is_box=False, cpy_range=80):
 
     print(f"==> {points.shape[0]} tracers found.")
     if is_box:
