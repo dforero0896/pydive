@@ -8,8 +8,8 @@ myext = Extension("pydive.helpers",
                   library_dirs=['/usr/lib/x86_64-linux-gnu'],
                   libraries=['m', 'gsl', 'gslcblas'],
                   language='c',
-                 # extra_compile_args=["-std=c++11"],
-                 # extra_link_args=["-std=c++11"]
+                  extra_compile_args=["-fopenmp"],
+                  extra_link_args=["-fopenmp"]
              )
 
 setup(name='pydive',

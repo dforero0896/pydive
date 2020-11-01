@@ -4,9 +4,9 @@ from scipy.spatial import Delaunay
 from helpers import single_circumsphere, get_void_catalog, get_void_catalog_parallel, c_ascii_writer
 import os
 import sys
-import argparse
+import gc
 
-def galaxies_to_voids(points, r_min=0, r_max=99999, box_size=2500, is_box=False, cpy_range=80):
+def galaxies_to_voids(points, r_min=0, r_max=99999, box_size=2500, is_box=False, cpy_range=80, n_threads=8):
 
     print(f"==> {points.shape[0]} tracers found.")
     if is_box:
@@ -22,19 +22,22 @@ def galaxies_to_voids(points, r_min=0, r_max=99999, box_size=2500, is_box=False,
             higher[:,i] -= box_size
             points = np.append(points, higher, axis=0)
         del lower, higher
+        gc.collect()
     print(f"==> Number of vertices: {points.shape[0]}")
     print(f"==> Building Delaunay Triangulation")   
-    tess = Delaunay(points)
-    del points
+    tess = Delaunay(points.astype(np.double))
+
     simplex_coords=tess.points[tess.simplices[:,:], :]
     del tess
+    gc.collect()
     n_simplices = simplex_coords.shape[0]
     print(f"==> Found {n_simplices} simplices", flush=True)
     result = np.empty((n_simplices, 4), dtype=np.double)
     print(f"==> Computing centers and radii")
-    get_void_catalog(simplex_coords, result, n_simplices)
+    if n_simplices < 1e6: get_void_catalog(simplex_coords, result, n_simplices)
+    else: get_void_catalog_parallel(simplex_coords.astype(np.double), result, n_simplices, n_threads)
     del simplex_coords
-    #get_void_catalog_parallel(simplex_coords, result, n_simplices)
+    gc.collect()
     result=result.astype(np.float32)
     if is_box:
         for i in range(3):
@@ -48,6 +51,7 @@ def galaxies_to_voids(points, r_min=0, r_max=99999, box_size=2500, is_box=False,
 
 if __name__=='__main__':
 
+    import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("-in", "--input_catalog", default = "tests/points.dat")
     parser.add_argument("-out", "--output_catalog", default = "tests/voids_pydive.dat")
