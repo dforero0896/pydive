@@ -1,10 +1,13 @@
 #cython: language_level=3 
+#cython: profile=True 
+#cython: boundscheck=False
 import cython
 from cython.parallel import prange, threadid
 cimport openmp
 import numpy as np
 from libc.stdlib cimport malloc, free
-from libc.stdio cimport FILE, fprintf, fopen, fclose, printf
+from libc.math cimport fabs
+from libc.stdio cimport FILE, fprintf, fopen, fclose, printf, fflush, stdout
 
 #################################################### Definitions ###########################################################
 
@@ -27,6 +30,7 @@ cdef extern from "gsl/gsl_permutation.h":
         size_t size
         size_t * data
     gsl_permutation *  gsl_permutation_alloc(size_t n) nogil
+    void gsl_permutation_free(gsl_permutation * p) nogil
 cdef extern from "gsl/gsl_matrix.h":
     ctypedef struct gsl_matrix:
         size_t size1
@@ -89,6 +93,7 @@ cdef double determinant(gsl_matrix * matrix, size_t dimension) nogil:
     cdef gsl_permutation *p = gsl_permutation_alloc(dimension)
     gsl_linalg_LU_decomp (matrix, p, &signum)
     cdef double det = gsl_linalg_LU_det(matrix, signum)
+    gsl_permutation_free(p)
     return det
 
 cdef void remove_col(gsl_matrix * original, gsl_matrix * out , int nrows, int ncols, int i) nogil:
@@ -113,6 +118,25 @@ cdef void remove_col(gsl_matrix * original, gsl_matrix * out , int nrows, int nc
         original_view = gsl_matrix_submatrix(original, 0, j, nrows, ncols-j)
         out_small_view = gsl_matrix_submatrix(out, 0, j-1, nrows, ncols-j)
         gsl_matrix_memcpy(&out_small_view.matrix, &original_view.matrix)
+
+@cython.boundscheck(False)
+cdef double simplex_volume(double[:,:] vertices) nogil:
+
+    cdef gsl_matrix * matrix = gsl_matrix_alloc(4, 4)
+    cdef double volume, elem
+    cdef Py_ssize_t i, j
+
+    for i in range(4):
+        for j in range(4):
+            elem = vertices[i,j]
+            gsl_matrix_set(matrix, i, j, elem)
+        gsl_matrix_set(matrix, 3, j, 1)
+    
+    volume = fabs(determinant(matrix, 4) / 6)
+
+    gsl_matrix_free(matrix)
+
+    return volume
 
 @cython.boundscheck(False)
 cdef void circumsphere(double[:,:] vertices, double[:] output) nogil:
@@ -160,10 +184,8 @@ cdef void circumsphere(double[:,:] vertices, double[:] output) nogil:
 
 def get_void_catalog(double[:,:,:] vertices, double[:,:] output, int n_simplices):
 
-    cdef Py_ssize_t i
-
+    cdef Py_ssize_t i    
     for i in range(n_simplices):
-
         circumsphere(vertices[i, :, :], output[i, :])
     
 def get_void_catalog_parallel(double[:,:,:] vertices, double[:,:] output, int n_simplices, int n_threads):
@@ -171,6 +193,74 @@ def get_void_catalog_parallel(double[:,:,:] vertices, double[:,:] output, int n_
     cdef Py_ssize_t i
     for i in prange(n_simplices, nogil=True, num_threads=n_threads):
         circumsphere(vertices[i, :, :], output[i, :])
+
+def get_void_catalog_volumes(double[:,:,:] vertices, double[:,:] output, int n_simplices):
+
+    cdef Py_ssize_t i    
+    for i in range(n_simplices):
+        circumsphere(vertices[i, :, :], output[i, :])
+        output[i,4] = simplex_volume(vertices[i, :, :])
+    
+def get_void_catalog_volumes_parallel(double[:,:,:] vertices, double[:,:] output, int n_simplices, int n_threads):
+
+    cdef Py_ssize_t i
+    for i in prange(n_simplices, nogil=True, num_threads=n_threads):
+        circumsphere(vertices[i, :, :], output[i, :])
+        output[i,4] = simplex_volume(vertices[i, :, :])
+
+def save_void_catalog(double[:,:,:] vertices, double[:] output, int n_simplices, str oname, double r_min, 
+                        double r_max, bint is_box, float low_range, float box_size, bint volume):
+
+    """ Save to ascii file directly as circumspheres are computed.
+        Useful when saving to named pipes for reading with other codes.
+        If there is need to use void data in python, do not use this function."""
+    printf(output.shape)
+    if volume and <int> output.shape[0] < 5:
+        raise ValueError("Output buffer not long enough to output simplex volume")
+
+
+    cdef float high_range  = low_range + box_size
+    cdef float out_range = 0
+
+    cdef FILE *fp
+    cdef bytes oname_bytes = oname.encode()
+    cdef char* oname_c = oname_bytes
+
+    fp = fopen(oname_c, "w")
+
+    cdef Py_ssize_t i, j
+    cdef int counter=0
+    printf("==> Saving voids with radius in (%lf, %lf)\n", r_min, r_max)
+    fflush(stdout)
+    for i in range(n_simplices):
+        circumsphere(vertices[i, :, :], output[:])
+        if volume:
+            output[4] = simplex_volume(vertices[i, :, :])
+        if (output[3] > r_min) and (output[3] < r_max):
+            if is_box:
+                if (output[0] > low_range-out_range) and (output[0] < high_range+out_range) and (output[1] > low_range-out_range) and (output[1] < high_range+out_range) and (output[2] > low_range-out_range) and (output[2] < high_range+out_range):
+                    counter+=1
+                    if not volume:
+                        fprintf(fp, "%lf %lf %lf %lf\n", output[0], output[1], output[2], output[3])                  
+                    else:
+                        fprintf(fp, "%lf %lf %lf %lf %lf\n", output[0], output[1], output[2], output[3], output[4])                  
+            else:
+                counter+=1
+                if not volume:
+                    fprintf(fp, "%lf %lf %lf %lf\n", output[0], output[1], output[2], output[3])                  
+                else:
+                    fprintf(fp, "%lf %lf %lf %lf %lf\n", output[0], output[1], output[2], output[3], output[4])                  
+
+    
+    
+    fclose(fp)
+    printf("==> Done, saved %i voids.\n", counter)
+    fflush(stdout)
+
+
+
+
+
 
 ########################################## Sky to Cartesian Coordinate conversion ################################################
 
@@ -183,6 +273,7 @@ cdef double comoving_dist_integrand(double x, void * params) nogil:
     cdef double OmegaL =  (<double *> params)[1]
     cdef double OmegaM =  (<double *> params)[2]
     cdef double c =  (<double *> params)[3]
+    #printf("%lf %lf %lf %lf\n", H0, OmegaL, OmegaM, c)
 
     cdef double H = H0 * sqrt(OmegaL + OmegaM * pow( 1 + x , 3))
 
@@ -225,7 +316,7 @@ def sky_to_cart_parallel(double[:,:] input, double[:,:] output, int n_lines, int
         output[i,2] = dist * sin(dec) * h
         
 
-def c_ascii_writer(double [:,:] oarr, int n_elem, str oname):
+def c_ascii_writer_double(double [:,:] oarr, int n_elem, str oname):
 
     cdef FILE *fp
     cdef bytes oname_bytes = oname.encode()
@@ -237,5 +328,20 @@ def c_ascii_writer(double [:,:] oarr, int n_elem, str oname):
 
     for i in range(n_elem):
         fprintf(fp, "%lf %lf %lf %lf\n", oarr[i,0], oarr[i,1], oarr[i,2], oarr[i,3])
+    
+    fclose(fp)
+
+def c_ascii_writer_single(float [:,:] oarr, int n_elem, str oname):
+
+    cdef FILE *fp
+    cdef bytes oname_bytes = oname.encode()
+    cdef char* oname_c = oname_bytes
+
+    fp = fopen(oname_c, "w")
+
+    cdef Py_ssize_t i
+
+    for i in range(n_elem):
+        fprintf(fp, "%f %f %f %f\n", oarr[i,0], oarr[i,1], oarr[i,2], oarr[i,3])
     
     fclose(fp)

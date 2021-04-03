@@ -2,3 +2,6 @@ src/DIVE.cpp
 bin/CGAL
 *.so
 LICENSE
+tests/galaxy*
+tests/voids*
+tests/CAT*
