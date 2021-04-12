@@ -268,7 +268,10 @@ def get_void_catalog_wdensity(double[:,:,:] vertices,
             vertex_index = simplex_indices[i,k]
             volumes[vertex_index] += volume #race condition 
     for i in prange(n_vertices, nogil=True, num_threads=n_threads):
-        density[i] = 4. * weights[i] / (selection[i] * volumes[i])
+        if volumes[i] > 0:
+            density[i] = 4. * weights[i] / (selection[i] * volumes[i])
+        else:
+            density[i] = -99999
         
 
 def save_void_catalog(double[:,:,:] vertices, double[:] output, int n_simplices, str oname, double r_min, 

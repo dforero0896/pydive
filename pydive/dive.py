@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from scipy.spatial import Delaunay
-from helpers import get_void_catalog, get_void_catalog_parallel, sky_to_cart_parallel, save_void_catalog, get_void_catalog_volumes, get_void_catalog_volumes_parallel
+from pydive import get_void_catalog, get_void_catalog_parallel, sky_to_cart_parallel, save_void_catalog
 import os
 import sys
 import gc
@@ -45,13 +45,9 @@ def galaxies_to_voids(points, r_min=0, r_max=99999, coordinate_conversion=False,
     if n_threads == 1 or n_threads is None: 
         if not volume:
             get_void_catalog(simplex_coords.astype(np.double), result, n_simplices)
-        else:
-            get_void_catalog_volumes(simplex_coords.astype(np.double), result, n_simplices)
     else: 
         if not volume:
             get_void_catalog_parallel(simplex_coords.astype(np.double), result, n_simplices, n_threads)
-        else:
-            get_void_catalog_volumes_parallel(simplex_coords.astype(np.double), result, n_simplices, n_threads)
     del simplex_coords
     gc.collect()
     result=result.astype(np.float32)
