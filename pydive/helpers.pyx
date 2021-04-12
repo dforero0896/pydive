@@ -189,32 +189,128 @@ def get_void_catalog(double[:,:,:] vertices, double[:,:] output, int n_simplices
         circumsphere(vertices[i, :, :], output[i, :])
     
 def get_void_catalog_parallel(double[:,:,:] vertices, double[:,:] output, int n_simplices, int n_threads):
+    """
+    Compute the void catalog (circumcenters and radii) only
+    Parameters:
+        vertices: ndarray of double, shape (n_simplices, 4, 3)
+            Array containing the coordinates (3) of the 4 vertices
+            that define the simplex.
+        output: ndarray of double, shape (n_simplices, 4)
+            Array to put the resulting void catalog in. Should
+            contain enough space for (x, y, z, r) values.
+        n_simplices: int
+            Number of simplices found by the triangulation. 
+            (n_simplices = vertices.shape[0])
+        n_threads: int
+            Number of threads to use if compiled with openmp support.
 
+    Returns:
+        None
+    """
     cdef Py_ssize_t i
     for i in prange(n_simplices, nogil=True, num_threads=n_threads):
         circumsphere(vertices[i, :, :], output[i, :])
+   
+def get_void_catalog_wdensity(double[:,:,:] vertices, 
+                                int[:,:] simplex_indices,
+                                double[:] weights,
+                                double[:] selection,
+                                double[:,:] output,
+                                double[:] volumes,
+                                double[:] density,
+                                int n_simplices, 
+                                int n_vertices, 
+                                int n_threads):
+    """
+    Compute the void catalog and estimate tracer density with DTFE
+    (Schaap, W. E. & van de Weygaert, R. 2000)
+    Parameters:
+        vertices: ndarray of double, shape (n_simplices, 4, 3)
+            Array containing the coordinates (3) of the 4 vertices
+            that define the simplex.
+        simplex_indices: ndarray of int, shape (n_simplices, 4)
+            Array containing the indices of the vertices that
+            define the simplex.
+        weights: ndarray of double, shape (n_vertices,)
+            Array containing the weights of each tracer.
+        selection: ndarray of double, shape (n_vertices,)
+            Array containing the values of the selection function 
+            at each vertex position.
+        output: ndarray of double, shape (n_simplices, 5)
+            Array to put the resulting void catalog in. Should
+            contain enough space for (x, y, z, r, v) values.
+        volumes: ndarray of double, shape (n_vertices,)
+            Array to output the volume of the contiguous Voronoi
+            cell for each vertex. 
+        density: ndarray of double, shape (n_vertices,)
+            Array to output the estimated local density for each
+            vertex.
+        n_simplices: int
+            Number of simplices found by the triangulation. 
+            (n_simplices = vertices.shape[0])
+        n_vertices: int
+            Number of vertices passed to the triangulation. 
+        n_threads: int
+            Number of threads to use if compiled with openmp support.
 
-def get_void_catalog_volumes(double[:,:,:] vertices, double[:,:] output, int n_simplices):
+    Returns:
+        None
+    """
 
-    cdef Py_ssize_t i    
+    cdef Py_ssize_t i, k, vertex_index
+    cdef double volume=0
+    #for i in prange(n_simplices, nogil=True, num_threads=n_threads):
     for i in range(n_simplices):
         circumsphere(vertices[i, :, :], output[i, :])
-        output[i,4] = simplex_volume(vertices[i, :, :])
-    
-def get_void_catalog_volumes_parallel(double[:,:,:] vertices, double[:,:] output, int n_simplices, int n_threads):
-
-    cdef Py_ssize_t i
-    for i in prange(n_simplices, nogil=True, num_threads=n_threads):
-        circumsphere(vertices[i, :, :], output[i, :])
-        output[i,4] = simplex_volume(vertices[i, :, :])
+        volume = simplex_volume(vertices[i, :, :])
+        output[i,4] = volume
+        for k in range(4):
+            vertex_index = simplex_indices[i,k]
+            volumes[vertex_index] += volume #race condition 
+    for i in prange(n_vertices, nogil=True, num_threads=n_threads):
+        density[i] = 4. * weights[i] / (selection[i] * volumes[i])
+        
 
 def save_void_catalog(double[:,:,:] vertices, double[:] output, int n_simplices, str oname, double r_min, 
                         double r_max, bint is_box, float low_range, float box_size, bint volume):
 
-    """ Save to ascii file directly as circumspheres are computed.
-        Useful when saving to named pipes for reading with other codes.
-        If there is need to use void data in python, do not use this function."""
-    printf(output.shape)
+    """ 
+    Save to ascii file directly as circumspheres are computed.
+    Useful when saving to named pipes for reading with other codes.
+    If there is need to use void data in python, do not use this function. 
+    
+    Compute the void catalog (circumcenters and radii) only
+    Parameters:
+        vertices: ndarray of double, shape (n_simplices, 4, 3)
+            Array containing the coordinates (3) of the 4 vertices
+            that define the simplex.
+        output: ndarray of double, shape (4,) ((5,) if volume==True)
+            Array to put the resulting void information in. Should
+            contain enough space for (x, y, z, r) ((x, y, z, r, v)) 
+            values.
+        n_simplices: int
+            Number of simplices found by the triangulation. 
+            (n_simplices = vertices.shape[0])
+        str: oname
+            Output path where to write void catalog
+        r_min: double
+            Minimum void radius to write
+        r_max: double
+            Maximum void radius to write
+        is_box: bool
+            Boolean flag defining if catalog is to be treated as
+            as a box.
+        low_range: float
+            Minimum x_i = (x, y, z) value.
+        box_size: float
+            Box size.
+        volume: bool
+            Boolean flag defining if simplex volumes should be written.
+      
+    Returns:
+        None
+    """
+    
     if volume and <int> output.shape[0] < 5:
         raise ValueError("Output buffer not long enough to output simplex volume")
 

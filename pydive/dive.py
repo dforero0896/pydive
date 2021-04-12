@@ -5,6 +5,7 @@ from helpers import get_void_catalog, get_void_catalog_parallel, sky_to_cart_par
 import os
 import sys
 import gc
+
 def extend_boundaries_box(points, box_size=2500, cpy_range=80, low_range=0):
     high_range=low_range+box_size
     print("==> Duplicating boundaries for periodic condition", flush=True)
