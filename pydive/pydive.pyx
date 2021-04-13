@@ -51,10 +51,31 @@ cdef extern from "gsl/gsl_matrix.h":
     gsl_matrix_view  gsl_matrix_submatrix(gsl_matrix * m, size_t k1, size_t k2, size_t n1, size_t n2) nogil
     int  gsl_matrix_memcpy(gsl_matrix * dest, gsl_matrix * src) nogil
 
+cdef extern from "gsl/gsl_vector.h":
+    ctypedef struct gsl_vector:
+        size_t size
+        size_t stride
+        double * data
+        gsl_block * block
+        int owner
+    gsl_vector *gsl_vector_alloc (const size_t n) nogil
+    void gsl_vector_set (gsl_vector * v, const size_t i, double x) nogil
+    void gsl_vector_free (gsl_vector * v) nogil
+cdef extern from "gsl/gsl_blas.h":
+    int gsl_blas_ddot (const gsl_vector * X,
+                   const gsl_vector * Y,
+                   double * result
+                   ) nogil
 cdef extern from "gsl/gsl_math.h":
     ctypedef struct gsl_function:
         double (* function) (double x, void * params) 
         void * params
+cdef extern from "gsl/gsl_linalg.h":
+    int gsl_linalg_LU_decomp (gsl_matrix * A, gsl_permutation * p, int *signum) nogil
+    int gsl_linalg_LU_solve (const gsl_matrix * LU,
+                         const gsl_permutation * p,
+                         const gsl_vector * b,
+                         gsl_vector * x) nogil
 cdef extern from "gsl/gsl_integration.h":
     ctypedef struct gsl_integration_workspace:
         size_t limit
@@ -119,18 +140,19 @@ cdef void remove_col(gsl_matrix * original, gsl_matrix * out , int nrows, int nc
         out_small_view = gsl_matrix_submatrix(out, 0, j-1, nrows, ncols-j)
         gsl_matrix_memcpy(&out_small_view.matrix, &original_view.matrix)
 
-@cython.boundscheck(False)
+
 cdef double simplex_volume(double[:,:] vertices) nogil:
 
+    # vertices has shape (nvertices, ndims) = (4, 3)
     cdef gsl_matrix * matrix = gsl_matrix_alloc(4, 4)
     cdef double volume, elem
     cdef Py_ssize_t i, j
 
-    for i in range(4):
+    for i in range(3):
         for j in range(4):
-            elem = vertices[i,j]
+            elem = vertices[j,i]
             gsl_matrix_set(matrix, i, j, elem)
-        gsl_matrix_set(matrix, 3, j, 1)
+            gsl_matrix_set(matrix, 3, j, 1)
     
     volume = fabs(determinant(matrix, 4) / 6)
 
@@ -138,7 +160,7 @@ cdef double simplex_volume(double[:,:] vertices) nogil:
 
     return volume
 
-@cython.boundscheck(False)
+
 cdef void circumsphere(double[:,:] vertices, double[:] output) nogil:
 
     cdef gsl_matrix * D_mat = gsl_matrix_alloc(4, 5)
@@ -220,6 +242,7 @@ def get_void_catalog_wdensity(double[:,:,:] vertices,
                                 double[:] density,
                                 int n_simplices, 
                                 int n_vertices, 
+                                double average_density,
                                 int n_threads):
     """
     Compute the void catalog and estimate tracer density with DTFE
@@ -259,6 +282,7 @@ def get_void_catalog_wdensity(double[:,:,:] vertices,
 
     cdef Py_ssize_t i, k, vertex_index
     cdef double volume=0
+    cdef double factor = 4. / average_density
     #for i in prange(n_simplices, nogil=True, num_threads=n_threads):
     for i in range(n_simplices):
         circumsphere(vertices[i, :, :], output[i, :])
@@ -269,12 +293,14 @@ def get_void_catalog_wdensity(double[:,:,:] vertices,
             volumes[vertex_index] += volume #race condition 
     for i in prange(n_vertices, nogil=True, num_threads=n_threads):
         if volumes[i] > 0:
-            density[i] = 4. * weights[i] / (selection[i] * volumes[i])
-        else:
-            density[i] = -99999
+            density[i] = 4. * weights[i] / (average_density * selection[i] * volumes[i])
+            #density[i] = factor / (volumes[i])
+        #else:
+        #    density[i] = -99999
         
 
 def save_void_catalog(double[:,:,:] vertices, double[:] output, int n_simplices, str oname, double r_min, 
+
                         double r_max, bint is_box, float low_range, float box_size, bint volume):
 
     """ 
@@ -360,7 +386,128 @@ def save_void_catalog(double[:,:,:] vertices, double[:] output, int n_simplices,
 
 
 
+def interpolate_at_circumcenters(double[:] density_at_vertices,
+                                 double[:,:] vertex_coordinates,
+                                 int[:,:] simplex_indices,
+                                 double[:,:] circumcenters,
+                                 double[:] density_at_voids,
+                                 int interp_kind,
+                                 int n_threads):
 
+    """
+    Interpolates the density field at the void positions.
+
+    Parameters:
+        density_at_vertices: ndarray of double, shape (n_vertices,)
+            Array containing the field values at the vertex positions
+        vertex_coordinates: ndarray of double, shape (n_vertices, 3)
+            Array containing the coordinates of points used for the 
+            tesselation.
+        simplex_indices: ndarray of int, shape (n_simplices, 4)
+            Array containing the indices in vertex_coordinates of the 
+            points that define each simplex.
+        circumcenters: ndarray of double, shape (n_simplices, 4)
+            Array containing the coordinates of each circumcenter and
+            the void radius.
+        density_at_voids: ndarray of double, shape (n_simplices,)
+            Array to output the interpolated densities.
+        interp_kind: int 0 or 1
+            If 0 IDW is used for each simplex. If 1, linear interpolation
+            is performed.
+        n_threads: int
+            Number of threads to use if compiled with openmp support.
+        
+    Returns:
+        None
+    """
+
+    cdef Py_ssize_t i
+    cdef double value_at_void
+    assert(interp_kind<2)
+    #for i in prange(simplex_indices.shape[0], nogil=True, num_threads=n_threads):
+    for i in range(simplex_indices.shape[0]):
+        if interp_kind==1:
+            value_at_void = interpolate_at_circumcenter_linear(density_at_vertices,
+                                                        vertex_coordinates,
+                                                        simplex_indices[i,:],
+                                                        circumcenters[i,:])
+        elif interp_kind == 0:
+            value_at_void = interpolate_at_circumcenter_idw(density_at_vertices,
+                                                    vertex_coordinates,
+                                                    simplex_indices[i,:],
+                                                    circumcenters[i,:],
+                                                    2)
+
+
+        density_at_voids[i] = value_at_void
+
+cdef double interpolate_at_circumcenter_linear(double[:] density_at_vertices,
+                                 double[:,:] vertex_coordinates,
+                                 int[:] simplex_indices,
+                                 double[:] circumcenter) nogil except -1:
+        
+    cdef Py_ssize_t i, j, k
+    #for i in prange(n_vertices, nogil=True, num_threads=n_threads):
+    cdef gsl_matrix * A = gsl_matrix_alloc(3, 3)
+    cdef gsl_vector * nablaf = gsl_vector_alloc(3)
+    cdef gsl_vector * f = gsl_vector_alloc(3)
+    cdef gsl_vector * dx = gsl_vector_alloc(3)
+    cdef int s
+    cdef double elem
+    cdef double value_at_void
+    cdef gsl_permutation * p = gsl_permutation_alloc (3);
+    
+    
+
+    for j in range(3): # Iterate over vertices, rows
+        gsl_vector_set(dx, j, circumcenter[j] - vertex_coordinates[simplex_indices[0],j])
+        gsl_vector_set(f, j, density_at_vertices[simplex_indices[j+1]] - density_at_vertices[simplex_indices[0]])
+        for k in range(3): # Iterate over dimensions, cols
+            elem = vertex_coordinates[simplex_indices[j+1], k] - vertex_coordinates[simplex_indices[0], k]
+            gsl_matrix_set(A, j, k, elem)
+    
+
+    gsl_linalg_LU_decomp (A, p, &s);
+    gsl_linalg_LU_solve (A, p, f, nablaf);
+
+
+    gsl_blas_ddot(nablaf, dx, &value_at_void)
+    value_at_void+=density_at_vertices[simplex_indices[0]]
+
+
+
+    gsl_permutation_free (p);
+    gsl_matrix_free(A)
+    gsl_vector_free(nablaf)
+    gsl_vector_free(f)
+    gsl_vector_free(dx)
+
+    return value_at_void
+cdef double interpolate_at_circumcenter_idw(double[:] density_at_vertices,
+                                            double[:,:] vertex_coordinates,
+                                            int[:] simplex_indices,
+                                            double[:] circumcenter,
+                                            float p) nogil except -1:
+                    
+    cdef Py_ssize_t i, j, k
+    cdef double elem
+    cdef double value_at_void
+    cdef double numerator = 0    
+    cdef double weight
+    
+    weight = 1. / circumcenter[3]**p
+    for j in range(4): # Iterate over vertices, rows
+        numerator += density_at_vertices[simplex_indices[j]] * weight
+    
+    value_at_void = numerator / (4 * weight)
+        
+        
+        
+    
+
+    
+
+    return value_at_void
 ########################################## Sky to Cartesian Coordinate conversion ################################################
 
 @cython.boundscheck(False)

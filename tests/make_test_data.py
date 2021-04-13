@@ -11,8 +11,14 @@ def make_lognormal_data(box_size=1000, seed=42):
     Plin = cosmology.LinearPower(cosmo, redshift, transfer='EisensteinHu')
     b1 = 2.0
 
-    cat = LogNormalCatalog(Plin=Plin, nbar=3e-3, BoxSize=1380., Nmesh=128, bias=b1, seed=42)
-    np.savetxt('tests/points.dat', output, fmt="%.5f")
+    cat = LogNormalCatalog(Plin=Plin, nbar=4e-4, BoxSize=box_size, Nmesh=512, bias=b1, seed=42)
+
+    real_mesh = cat.to_mesh(compensated=True, resampler='cic', position='Position')
+    mesh_array = real_mesh.compute()
+    print(mesh_array.shape)
+    np.save('tests/delta_cic_lognorm.npy', mesh_array)
+    np.savetxt('tests/points.dat', cat['Position'].compute(), fmt="%.5f")
+
 if __name__=='__main__':
 
     #make_test_data(int(1e4))

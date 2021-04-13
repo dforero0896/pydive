@@ -12,8 +12,8 @@ if OMP:
 
 myext = Extension("pydive.pydive",
                   sources=['pydive/pydive.pyx'],
-                  include_dirs=[numpy.get_include(), '/usr/include', '/home/astro/dforero/lib/gsl-1.13/include','/home/astro/dforero/.conda/envs/mybase/include'],
-                  library_dirs=['/usr/lib/x86_64-linux-gnu', '/home/astro/dforero/lib/gsl-1.13/lib', '/home/astro/dforero/.conda/envs/mybase/lib'],
+                  include_dirs=[numpy.get_include(), '/usr/include', '/global/common/sw/cray/cnl7/haswell/gsl/2.5/intel/19.0.3.199/7twqxxq/include'],
+                  library_dirs=['/usr/lib/x86_64-linux-gnu', '/global/common/sw/cray/cnl7/haswell/gsl/2.5/intel/19.0.3.199/7twqxxq/lib'],
                   libraries=['m', 'gsl', 'gslcblas'],
                   language='c',
                   extra_compile_args=extra_compile_args,

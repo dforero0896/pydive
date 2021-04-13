@@ -5,3 +5,4 @@ LICENSE
 tests/galaxy*
 tests/voids*
 tests/CAT*
+*.npy
