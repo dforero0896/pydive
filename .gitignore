@@ -6,3 +6,4 @@ tests/galaxy*
 tests/voids*
 tests/CAT*
 *.npy
+*/.ipynb_checkpoints

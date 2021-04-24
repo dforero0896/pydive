@@ -9,7 +9,7 @@ def make_lognormal_data(box_size=1000, seed=42):
     redshift = 0.55
     cosmo = cosmology.Planck15
     Plin = cosmology.LinearPower(cosmo, redshift, transfer='EisensteinHu')
-    b1 = 2.0
+    b1 = 1.0 #For DM field 
 
     cat = LogNormalCatalog(Plin=Plin, nbar=4e-4, BoxSize=box_size, Nmesh=512, bias=b1, seed=42)
 

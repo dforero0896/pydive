@@ -1,6 +1,6 @@
 #cython: language_level=3 
 #cython: profile=True 
-#cython: boundscheck=False
+#cython: boundscheck=True
 import cython
 from cython.parallel import prange, threadid
 cimport openmp
@@ -161,44 +161,58 @@ cdef double simplex_volume(double[:,:] vertices) nogil:
     return volume
 
 
-cdef void circumsphere(double[:,:] vertices, double[:] output) nogil:
+cdef int circumsphere(double[:,:] vertices, double[:] output) nogil except -1:
 
     cdef gsl_matrix * D_mat = gsl_matrix_alloc(4, 5)
     cdef gsl_matrix * dummy_mat = gsl_matrix_alloc(4, 4)
     cdef double * dets = <double *> malloc(5 * sizeof(double))
+    #cdef double dets[5]
     cdef double tmp
     cdef Py_ssize_t i, j,k
     cdef double sq
     cdef double elem
     
     # create matrix a
+    
     for i in range(4):
         sq=0
         for j in range(3):
             elem = vertices[i,j]
+            #printf("%lf ", elem)
             gsl_matrix_set(D_mat, i, j+1, elem)
             sq+=elem*elem
+        #printf("\n")
         gsl_matrix_set(D_mat, i, 4, 1)
         gsl_matrix_set(D_mat, i, 0, sq)
     
+    #fflush(stdout)
     
     
     for i in range(5):
+        dets[i] = 0
         remove_col(D_mat, dummy_mat, 4, 5, i)
         dets[i] = determinant(dummy_mat, 4)
-        #printf("%lf ", dets[i])
+        #printf("%e ", dets[i])
     #printf("\n")
+    #fflush(stdout)
     dets[2]*=-1
     
     gsl_matrix_free(dummy_mat)
     gsl_matrix_free(D_mat)
     sq=0
     for i in range(3):
+        #if fabs(dets[0]) >  1e-8 :
         output[i] = dets[i+1]/(2*dets[0])
         sq+=dets[i+1]*dets[i+1]
-    if dets[0] !=0 :
+        #else:
+        #    output[i] = -1
+    
+    if fabs(dets[0]) >  1e-8 :
+        #printf("%lf, %i\n", dets[0], <bint> dets[0])
+        #fflush(stdout)
         output[3] = sqrt((sq-4*dets[0]*dets[4]) / (4 * dets[0] * dets[0]) )
     else:
+        
         output[3]=0
 
     free(dets)
@@ -280,7 +294,7 @@ def get_void_catalog_wdensity(double[:,:,:] vertices,
         None
     """
 
-    cdef Py_ssize_t i, k, vertex_index
+    cdef Py_ssize_t i, k, vertex_index, l, m
     cdef double volume=0
     cdef double factor = 4. / average_density
     #for i in prange(n_simplices, nogil=True, num_threads=n_threads):
@@ -457,11 +471,11 @@ cdef double interpolate_at_circumcenter_linear(double[:] density_at_vertices,
     cdef double value_at_void
     cdef gsl_permutation * p = gsl_permutation_alloc (3);
     
-    
+    cdef int vertex_id = 1
 
     for j in range(3): # Iterate over vertices, rows
-        gsl_vector_set(dx, j, circumcenter[j] - vertex_coordinates[simplex_indices[0],j])
-        gsl_vector_set(f, j, density_at_vertices[simplex_indices[j+1]] - density_at_vertices[simplex_indices[0]])
+        gsl_vector_set(dx, j, circumcenter[j] - vertex_coordinates[simplex_indices[vertex_id],j])
+        gsl_vector_set(f, j, density_at_vertices[simplex_indices[j+1]] - density_at_vertices[simplex_indices[vertex_id]])
         for k in range(3): # Iterate over dimensions, cols
             elem = vertex_coordinates[simplex_indices[j+1], k] - vertex_coordinates[simplex_indices[0], k]
             gsl_matrix_set(A, j, k, elem)
@@ -472,7 +486,7 @@ cdef double interpolate_at_circumcenter_linear(double[:] density_at_vertices,
 
 
     gsl_blas_ddot(nablaf, dx, &value_at_void)
-    value_at_void+=density_at_vertices[simplex_indices[0]]
+    value_at_void+=density_at_vertices[simplex_indices[vertex_id]]
 
 
 
@@ -494,12 +508,17 @@ cdef double interpolate_at_circumcenter_idw(double[:] density_at_vertices,
     cdef double value_at_void
     cdef double numerator = 0    
     cdef double weight
-    
-    weight = 1. / circumcenter[3]**p
+    if circumcenter[3] > 1e-8:
+        weight = 1. / circumcenter[3]**p
+    else:
+        weight = 0
     for j in range(4): # Iterate over vertices, rows
         numerator += density_at_vertices[simplex_indices[j]] * weight
     
-    value_at_void = numerator / (4 * weight)
+    if weight > 1e-8:
+        value_at_void = numerator / (4 * weight)
+    else:
+        value_at_void =0
         
         
         
