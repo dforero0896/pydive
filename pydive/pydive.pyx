@@ -172,7 +172,7 @@ cdef double facet_area(double[:] vectora, double[:] vectorb) nogil:
 
 cdef inline double sphericity(double simp_volume, double simp_area) nogil:
     
-    cdef double sph = pow(PI, 1./3) * pow(6 * simp_volume, 2./3) / simp_area
+    cdef double sph = pow(36 * PI * simp_volume * simp_volume, 1./3)  / simp_area
 
     return sph
 
