@@ -1,10 +1,12 @@
+
+import os
+import sys
+import gc
 import numpy as np
 import pandas as pd
 from scipy.spatial import Delaunay
 from pydive import get_void_catalog, get_void_catalog_parallel, sky_to_cart_parallel, save_void_catalog
-import os
-import sys
-import gc
+
 
 def extend_boundaries_box(points, box_size=2500, cpy_range=80, low_range=0):
     high_range=low_range+box_size

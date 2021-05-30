@@ -4,14 +4,14 @@
 {
     "distutils": {
         "depends": [
-            "/global/common/sw/cray/cnl7/haswell/gsl/2.5/intel/19.0.3.199/7twqxxq/include/gsl/gsl_blas.h",
-            "/global/common/sw/cray/cnl7/haswell/gsl/2.5/intel/19.0.3.199/7twqxxq/include/gsl/gsl_block.h",
-            "/global/common/sw/cray/cnl7/haswell/gsl/2.5/intel/19.0.3.199/7twqxxq/include/gsl/gsl_integration.h",
-            "/global/common/sw/cray/cnl7/haswell/gsl/2.5/intel/19.0.3.199/7twqxxq/include/gsl/gsl_linalg.h",
-            "/global/common/sw/cray/cnl7/haswell/gsl/2.5/intel/19.0.3.199/7twqxxq/include/gsl/gsl_math.h",
-            "/global/common/sw/cray/cnl7/haswell/gsl/2.5/intel/19.0.3.199/7twqxxq/include/gsl/gsl_matrix.h",
-            "/global/common/sw/cray/cnl7/haswell/gsl/2.5/intel/19.0.3.199/7twqxxq/include/gsl/gsl_permutation.h",
-            "/global/common/sw/cray/cnl7/haswell/gsl/2.5/intel/19.0.3.199/7twqxxq/include/gsl/gsl_vector.h",
+            "/usr/include/gsl/gsl_blas.h",
+            "/usr/include/gsl/gsl_block.h",
+            "/usr/include/gsl/gsl_integration.h",
+            "/usr/include/gsl/gsl_linalg.h",
+            "/usr/include/gsl/gsl_math.h",
+            "/usr/include/gsl/gsl_matrix.h",
+            "/usr/include/gsl/gsl_permutation.h",
+            "/usr/include/gsl/gsl_vector.h",
             "/usr/include/math.h"
         ],
         "extra_compile_args": [
@@ -22,7 +22,7 @@
             "-fopenmp"
         ],
         "include_dirs": [
-            "/global/homes/d/dforero/.conda/envs/nbk-env/lib/python3.8/site-packages/numpy/core/include",
+            "/home/astro/dforero/.local/lib/python3.6/site-packages/numpy/core/include",
             "/usr/include",
             "/global/common/sw/cray/cnl7/haswell/gsl/2.5/intel/19.0.3.199/7twqxxq/include"
         ],
