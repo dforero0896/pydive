@@ -2,7 +2,7 @@
 import sys
 import time
 #sys.path.append("./pydive")
-from pydive.pydive import get_void_catalog_wdensity, interpolate_at_circumcenters
+from pydive.pydive import get_void_catalog_dtfe, interpolate_at_circumcenters
 from dive import extend_boundaries_box
 from scipy.spatial import Delaunay
 from scipy.interpolate import LinearNDInterpolator, NearestNDInterpolator
@@ -114,17 +114,17 @@ if __name__ == '__main__':
     density = np.empty((points.shape[0],), dtype=np.double)
     density[:] = np.nan
     
-    get_void_catalog_wdensity(simplex_coordinates, 
-                                tess.simplices,
-                                weights,
-                                selection,
-                                voids,
-                                volumes,
-                                density,
-                                simplex_coordinates.shape[0], 
-                                points.shape[0],
-                                ngal,
-                                4)
+    get_void_catalog_dtfe(simplex_coordinates, 
+                            tess.simplices,
+                            weights,
+                            selection,
+                            voids,
+                            volumes,
+                            density,
+                            simplex_coordinates.shape[0], 
+                            points.shape[0],
+                            ngal,
+                            4)
     #exit()
     
     print((volumes==0).sum(), tess.coplanar.shape, flush=True)

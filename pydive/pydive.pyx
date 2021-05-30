@@ -160,6 +160,36 @@ cdef double simplex_volume(double[:,:] vertices) nogil:
 
     return volume
 
+cdef double facet_area(double[:] vectora, double[:] vectorb) nogil:
+    cdef double x, y, z
+    x = vectora[1]*vectorb[2] - vectora[2]*vectorb[1]
+    y = - (vectora[0]*vectorb[2] - vectora[2]*vectorb[0])
+    z = vectora[0]*vectorb[1] - vectora[1]*vectorb[0]
+
+    facet_area = 0.5 * sqrt(x*x + y*y + z*z)
+
+    return facet_area
+
+cdef inline double sphericity(double simp_volume, double simp_area) nogil:
+    
+    cdef double sph = pow(PI, 1./3) * pow(6 * simp_volume, 2./3) / simp_area
+
+    return sph
+
+
+cdef double simplex_area(double[:,:] vertices) nogil:
+
+    cdef double tot_area = 0
+    cdef Py_ssize_t i, j
+    tot_area += facet_area(vertices[0,:], vertices[1,:])
+    tot_area += facet_area(vertices[0,:], vertices[2,:])
+    tot_area += facet_area(vertices[0,:], vertices[3,:])
+    tot_area += facet_area(vertices[1,:], vertices[2,:])
+
+    return tot_area
+            
+
+
 
 cdef int circumsphere(double[:,:] vertices, double[:] output) nogil except -1:
 
@@ -178,38 +208,29 @@ cdef int circumsphere(double[:,:] vertices, double[:] output) nogil except -1:
         sq=0
         for j in range(3):
             elem = vertices[i,j]
-            #printf("%lf ", elem)
+
             gsl_matrix_set(D_mat, i, j+1, elem)
             sq+=elem*elem
-        #printf("\n")
         gsl_matrix_set(D_mat, i, 4, 1)
         gsl_matrix_set(D_mat, i, 0, sq)
     
-    #fflush(stdout)
+    
     
     
     for i in range(5):
         dets[i] = 0
         remove_col(D_mat, dummy_mat, 4, 5, i)
         dets[i] = determinant(dummy_mat, 4)
-        #printf("%e ", dets[i])
-    #printf("\n")
-    #fflush(stdout)
     dets[2]*=-1
     
     gsl_matrix_free(dummy_mat)
     gsl_matrix_free(D_mat)
     sq=0
     for i in range(3):
-        #if fabs(dets[0]) >  1e-8 :
         output[i] = dets[i+1]/(2*dets[0])
         sq+=dets[i+1]*dets[i+1]
-        #else:
-        #    output[i] = -1
     
     if fabs(dets[0]) >  1e-8 :
-        #printf("%lf, %i\n", dets[0], <bint> dets[0])
-        #fflush(stdout)
         output[3] = sqrt((sq-4*dets[0]*dets[4]) / (4 * dets[0] * dets[0]) )
     else:
         
@@ -247,17 +268,17 @@ def get_void_catalog_parallel(double[:,:,:] vertices, double[:,:] output, int n_
     for i in prange(n_simplices, nogil=True, num_threads=n_threads):
         circumsphere(vertices[i, :, :], output[i, :])
    
-def get_void_catalog_wdensity(double[:,:,:] vertices, 
-                                int[:,:] simplex_indices,
-                                double[:] weights,
-                                double[:] selection,
-                                double[:,:] output,
-                                double[:] volumes,
-                                double[:] density,
-                                int n_simplices, 
-                                int n_vertices, 
-                                double average_density,
-                                int n_threads):
+def get_void_catalog_dtfe(double[:,:,:] vertices, 
+                            int[:,:] simplex_indices,
+                            double[:] weights,
+                            double[:] selection,
+                            double[:,:] output,
+                            double[:] volumes,
+                            double[:] density,
+                            int n_simplices, 
+                            int n_vertices, 
+                            double average_density,
+                            int n_threads):
     """
     Compute the void catalog and estimate tracer density with DTFE
     (Schaap, W. E. & van de Weygaert, R. 2000)
@@ -312,6 +333,101 @@ def get_void_catalog_wdensity(double[:,:,:] vertices,
         #else:
         #    density[i] = -99999
         
+
+def get_satellites(double[:,:] data, 
+                    int[:,:,:] grid_void_count, 
+                    int[:,:,:,:] grid_id_buffer, 
+                    int[:] central_id, 
+                    bint[:] is_central, 
+                    int[:] n_satellites, 
+                    double[:] distances, 
+                    double[:] central_radius, 
+                    double box_size):
+
+    """
+    Compute the number of satellites from a void catalog
+
+    Parameters:
+
+    data: ndarray shape (nvoids, 4)
+        Array containing the void coordinates and radii (x,y,z,r)
+    grid_void_count: ndarray shape (ngrid, ngrid, ngrid)
+        Array containing the number of voids in the cell (ix, iy, iz)
+        See func. allocate_to_grid
+    grid_id_buffer: ndarray (ngrid, ngrid, ngrid, nbuffer)
+        Array containing the ids of the voids in the cell (ix, iy, iz)
+        See func. allocate_to_grid
+    central_id: ndarray (nvoids,)
+        Array to store the id of the central void
+    is_central: ndarray (nvoids,)
+        Array to store boolean value (True if central)
+    n_satellites: ndarray (nvoids,)
+        Array to store number of satellites for a central void,
+        zero if satellite.
+    distances: ndarray (nvoids,)
+        Array to store de distance to the corresponding central void.
+    central_radius: ndarray (nvoids,)
+        Array to store the radius of the corresponding central void.
+    box_size: double
+        Size of the box in which the grid is embedded
+    
+    """
+
+    cdef int n_grid = grid_void_count.shape[0]
+    cdef double inv_bin_size = n_grid / box_size
+    cdef int xmin, xmax, ymin, ymax, zmin, zmax
+    cdef Py_ssize_t i, j, k
+    cdef double sqr, r
+
+    for i in range(data.shape[0]):
+        
+        if is_central[i]:
+            sqr = data[i,3]*data[i,3]
+            central_id[i] = i
+            central_radius[i] = data[i,3]
+            r = data[i,3] 
+            xmin = <int> (((data[i,0] - r) * inv_bin_size) )
+            xmax = <int> (((data[i,0] + r) * inv_bin_size) )
+            ymin = <int> (((data[i,1] - r) * inv_bin_size) )
+            ymax = <int> (((data[i,1] + r) * inv_bin_size) )
+            zmin = <int> (((data[i,2] - r) * inv_bin_size) )
+            zmax = <int> (((data[i,2] + r) * inv_bin_size) )
+            
+            for xid in range(xmin, xmax+1):
+                if xid >= n_grid: continue
+                for yid in range(ymin, ymax+1):
+                    if yid >= n_grid: continue
+                    for zid in range(zmin, zmax+1):
+                        if zid >= n_grid: continue
+                        
+                        for j in range(grid_void_count[xid, yid, zid]):
+                            k = grid_id_buffer[xid, yid, zid, j]
+                            
+                            
+                            if k <= i: continue
+                            
+                            distance = (data[i, 0] - data[k, 0])**2 + (data[i, 1] - data[k, 1])**2 + (data[i, 2] - data[k, 2])**2
+                            
+                            if distance < sqr:
+                                
+                                if is_central[k]:    
+                                    central_id[k] = i
+                                    central_radius[k] = data[i,3]
+                                    is_central[k] = False
+                                    n_satellites[i] += 1
+                                    distances[k] = distance
+                                elif not is_central[k] and distances[k] < distance:
+                                    n_satellites[central_id[k]] -= 1
+                                    central_id[k] = i
+                                    central_radius[k] = data[i,3]
+                                    is_central[k] = False
+                                    n_satellites[i] += 1
+                                    distances[k] = distance
+
+
+
+
+
 
 def save_void_catalog(double[:,:,:] vertices, double[:] output, int n_simplices, str oname, double r_min, 
 
@@ -520,11 +636,6 @@ cdef double interpolate_at_circumcenter_idw(double[:] density_at_vertices,
     else:
         value_at_void =0
         
-        
-        
-    
-
-    
 
     return value_at_void
 ########################################## Sky to Cartesian Coordinate conversion ################################################
@@ -610,3 +721,28 @@ def c_ascii_writer_single(float [:,:] oarr, int n_elem, str oname):
         fprintf(fp, "%f %f %f %f\n", oarr[i,0], oarr[i,1], oarr[i,2], oarr[i,3])
     
     fclose(fp)
+
+
+cpdef int allocate_to_grid(double[:,:] data, 
+                    int[:,:,:] grid_void_count, 
+                    int[:,:,:,:] grid_id_buffer, 
+                    double box_size,
+                    int n_threads) nogil except -1:
+    
+    cdef int n_grid = grid_void_count.shape[0]
+    cdef double bin_size = box_size / n_grid
+    cdef double inv_bin_size = n_grid / box_size
+    cdef int n_buffer = grid_id_buffer.shape[3]
+    cdef int idx, idy, idz
+    cdef int i
+    for i in prange(data.shape[0], nogil=True, num_threads=n_threads):
+        
+        idx = <int> ((data[i, 0] * inv_bin_size) + n_grid) % n_grid
+        idy = <int> ((data[i, 1] * inv_bin_size) + n_grid) % n_grid
+        idz = <int> ((data[i, 2] * inv_bin_size) + n_grid) % n_grid
+        
+        if n_buffer > grid_void_count[idx, idy, idz]: return -1
+        grid_id_buffer[idx, idy, idz, grid_void_count[idx, idy, idz]] = i
+        grid_void_count[idx, idy, idz] += 1
+    
+    return 0
