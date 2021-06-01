@@ -187,8 +187,6 @@ cdef double simplex_area(double[:,:] vertices) nogil:
     tot_area += facet_area(vertices[1,:], vertices[2,:])
 
     return tot_area
-            
-
 
 
 cdef int circumsphere(double[:,:] vertices, double[:] output) nogil except -1:
@@ -244,6 +242,20 @@ def get_void_catalog(double[:,:,:] vertices, double[:,:] output, int n_simplices
     cdef Py_ssize_t i    
     for i in range(n_simplices):
         circumsphere(vertices[i, :, :], output[i, :])
+
+def get_sphericity(double[:,:,:] vertices, double[:,:] output, int n_simplices, int n_threads):
+
+    cdef Py_ssize_t i
+    cdef double sph, volume, area
+    for i in prange(n_simplices, nogil=True, num_threads=n_threads):
+        volume = simplex_volume(vertices[i, :, :])
+        area = simplex_area(vertices[i, :, :])
+        output[i,0] = sphericity(volume, area)
+        output[i,1] = area
+        output[i,2] = volume
+        #output[i] = sph
+        
+
     
 def get_void_catalog_parallel(double[:,:,:] vertices, double[:,:] output, int n_simplices, int n_threads):
     """
@@ -746,3 +758,17 @@ cpdef int allocate_to_grid(double[:,:] data,
         grid_void_count[idx, idy, idz] += 1
     
     return 0
+
+
+def extend_boundaries_box(points, box_size=2500, cpy_range=80, low_range=0):
+    high_range=low_range+box_size
+    print("==> Duplicating boundaries for periodic condition", flush=True)
+    for i in range(3):
+        lower = points[points[:,i] < low_range + cpy_range]
+        lower[:,i] += box_size
+        points = np.append(points, lower, axis=0) #This is not memory efficient.
+        higher = points[points[:,i] >= high_range - cpy_range]
+        higher[:,i] -= box_size
+        points = np.append(points, higher, axis=0)
+    del lower, higher
+    return points
