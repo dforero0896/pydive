@@ -1,6 +1,6 @@
 #cython: language_level=3 
 #cython: profile=True 
-#cython: boundscheck=True
+#cython: boundscheck=False
 import cython
 from cython.parallel import prange, threadid
 cimport openmp
@@ -112,6 +112,7 @@ cdef extern from "delaunay_backend.cpp":
         vector[double] x, y, z, r
         size_t n_simplices
     DelaunayOutput cdelaunay(vector[double] X, vector[double] Y, vector[double] Z) nogil
+    DelaunayOutput cdelaunay_periodic(vector[double] X, vector[double] Y, vector[double] Z, double box_size, double cpy_range) nogil
 
 ######################################### DT void catalog computations ##############################################
 
@@ -780,21 +781,33 @@ def extend_boundaries_box(points, box_size=2500, cpy_range=80, low_range=0):
     del lower, higher
     return points
 
-def delaunay(double[:,:] points):
+def get_void_catalog_cgal(double[:,:] points,
+                        bint periodic=False,
+                        double box_size = 1000,
+                        double cpy_range = 40):
 
     cdef Py_ssize_t i,k
     cdef vector[double] in_x, in_y, in_z
     in_x.reserve(points.shape[0])
     in_y.reserve(points.shape[0])
     in_z.reserve(points.shape[0])
+    
     for i in range(points.shape[0]):
         in_x.push_back(points[i,0])
         in_y.push_back(points[i,1])
         in_z.push_back(points[i,2])
     
-    cdef DelaunayOutput voids = cdelaunay(in_x, in_y, in_z)
+    cdef DelaunayOutput voids
+    if not periodic:
+        voids = cdelaunay(in_x, in_y, in_z)
+    else:
+        assert box_size is not None
+        assert cpy_range is not None
+        voids = cdelaunay_periodic(in_x, in_y, in_z, box_size, cpy_range)
     cdef size_t n_simplices
-    
+    in_x.clear()
+    in_y.clear()
+    in_z.clear()
     
     n_simplices = voids.n_simplices
 

@@ -1,21 +1,36 @@
 import numpy as np
 import sys, time, os
 sys.path.append("./pydive")
-from pydive.pydive import delaunay, get_void_catalog
+from pydive.pydive import get_void_catalog_cgal, get_void_catalog, extend_boundaries_box
 from scipy.spatial import Delaunay
 import matplotlib.pyplot as plt
 import pandas as pd
 
 if __name__ == '__main__':
-    N = int(1e4)
+    N = int(1e5)
     np.random.seed(42)
-    points = np.random.random((N,3)) * 2500
+    points_raw = np.random.random((N,3)) * 2500
     s = time.time()
-    voids = delaunay(points)
+    points = extend_boundaries_box(points_raw, box_size=2500, cpy_range=100).astype(np.double)
+    #points = points_raw
+    print(f"Duplicating boundaries took {time.time() - s} s")
+    s = time.time()
+    voids = get_void_catalog_cgal(points_raw, periodic=True, box_size=2500, cpy_range=40)
+    mask = (voids[:,:3] > 0).all(axis=1) & (voids[:,:3] < 2500).all(axis=1)
+    voids = voids[mask]
     print(f"CGAL took {time.time() - s} s")
-    print(voids)
-    #print(pd.DataFrame(voids, columns=['x', 'y', 'z', 'r']).describe())
-    plt.hist(voids[:,3], bins=100, histtype='step', label='cgal')
+    voids_df = pd.DataFrame(voids, columns=['x', 'y', 'z', 'r'])
+    print(voids_df.describe())
+
+    #bins = np.logspace(-4, 11, 101)
+    bins=100
+    fig, ax = plt.subplots(2, 2, figsize=(10,10))
+    axr = ax.ravel()
+    for i in range(voids.shape[1]):
+        axr[i].hist(voids[:,i], histtype="step", color="b", label="PyDIVE CGAL", bins=bins)
+        axr[i].set_title(voids_df.columns[i])
+        #axr[i].set_xscale('log')
+        axr[i].legend()
 
     s = time.time()
     tess = Delaunay(points)
@@ -23,10 +38,18 @@ if __name__ == '__main__':
     n_simplices = vertices.shape[0]
     voids = np.zeros((n_simplices, 4), dtype=np.double)
     get_void_catalog(vertices,  voids, n_simplices)
+    mask = (voids[:,:3] > 0).all(axis=1) & (voids[:,:3] < 2500).all(axis=1)
+    voids = voids[mask]
     print(f"Scipy took {time.time() - s} s")
-    print(voids)
-    #print(pd.DataFrame(voids, columns=['x', 'y', 'z', 'r']).describe())
-    plt.hist(voids[:,3], bins=100, histtype='step', ls='--', label='scipy')
+    voids_df = pd.DataFrame(voids, columns=['x', 'y', 'z', 'r'])
+    print(voids_df.describe())
+    
+
+    for i in range(voids.shape[1]):
+        axr[i].hist(voids[:,i], histtype="step", color="r", label="PyDIVE Scipy", bins=bins, ls='--')
+        axr[i].set_title(voids_df.columns[i])
+        #axr[i].set_xscale('log')
+        axr[i].legend()
 
     plt.legend()
 
