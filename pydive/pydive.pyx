@@ -804,6 +804,7 @@ def get_void_catalog_cgal(double[:,:] points,
         assert box_size is not None
         assert cpy_range is not None
         voids = cdelaunay_periodic(in_x, in_y, in_z, box_size, cpy_range)
+        
     cdef size_t n_simplices
     in_x.clear()
     in_y.clear()

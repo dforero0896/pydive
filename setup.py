@@ -1,6 +1,12 @@
 from setuptools import setup, Extension, find_packages
 from Cython.Build import cythonize
 import numpy
+import os
+os.environ["CC"]="/home/astro/zhaoc/local/bin/gcc"
+os.environ["CXX"]="/home/astro/zhaoc/local/bin/g++"
+print(os.environ['LD_LIBRARY_PATH'])
+print(os.environ['PATH'])
+
 
 extra_compile_args=['-fPIC']
 extra_link_args=[]
@@ -14,20 +20,16 @@ myext = Extension("pydive.pydive",
                   sources=['pydive/pydive.pyx',
                             #'pydive/delaunay_backend.cpp'
                             ],
-                  include_dirs=[numpy.get_include(), '/usr/include', '/usr/local/inculde'
-                                '/global/common/sw/cray/cnl7/haswell/gsl/2.5/intel/19.0.3.199/7twqxxq/include', 
-                                #'/home/daniel/libraries/cgal/CGAL-5.1/include',
-                                #'/home/daniel/libraries/CGAL-4.9/include',
-                                '/home/daniel/anaconda3/envs/dive/include'
-                                '/home/daniel/anaconda3/envs/dive/include/boost'],
+                  include_dirs=[numpy.get_include(), 
+                                '/home/astro/dforero/lib/CGAL-5.2.2/include', 
+                                '/home/astro/zhaoc/local/lib/gcc/x86_64-pc-linux-gnu/10.3.0/include',
+                                '/home/astro/zhaoc/local/lib/gcc/x86_64-pc-linux-gnu/10.3.0/include-fixed'
+                                ],
                                 
-                  library_dirs=['/usr/local/lib',
-                                '/usr/lib/x86_64-linux-gnu', 
-                                #'/global/common/sw/cray/cnl7/haswell/gsl/2.5/intel/19.0.3.199/7twqxxq/lib',
-                                '/home/daniel/anaconda3/envs/dive/lib',
-                                #'/home/daniel/libraries/cgal/CGAL-5.1/lib'
-                                #'/home/daniel/libraries/CGAL-4.9/lib'
-                                
+                  library_dirs=[
+                                '/home/astro/dforero/lib/CGAL-5.2.2/build/lib',
+                                '/home/astro/zhaoc/local/lib',
+                                '/home/astro/zhaoc/local/lib64'
                                 ],
                   libraries=['m', 'gsl', 'gslcblas', 'CGAL', 'gmp', 'mpfr'],
                   language='c++',

@@ -4,15 +4,6 @@
 {
     "distutils": {
         "depends": [
-            "/usr/include/gsl/gsl_blas.h",
-            "/usr/include/gsl/gsl_block.h",
-            "/usr/include/gsl/gsl_integration.h",
-            "/usr/include/gsl/gsl_linalg.h",
-            "/usr/include/gsl/gsl_math.h",
-            "/usr/include/gsl/gsl_matrix.h",
-            "/usr/include/gsl/gsl_permutation.h",
-            "/usr/include/gsl/gsl_vector.h",
-            "/usr/include/math.h",
             "pydive/delaunay_backend.cpp"
         ],
         "extra_compile_args": [
@@ -24,10 +15,10 @@
         ],
         "include_dirs": [
             "pydive",
-            "/home/daniel/anaconda3/envs/dive/lib/python3.7/site-packages/numpy/core/include",
-            "/usr/include",
-            "/usr/local/inculde/global/common/sw/cray/cnl7/haswell/gsl/2.5/intel/19.0.3.199/7twqxxq/include",
-            "/home/daniel/anaconda3/envs/dive/include/home/daniel/anaconda3/envs/dive/include/boost"
+            "/home/astro/dforero/.local/lib/python3.6/site-packages/numpy/core/include",
+            "/home/astro/dforero/lib/CGAL-5.2.2/include",
+            "/home/astro/zhaoc/local/lib/gcc/x86_64-pc-linux-gnu/10.3.0/include",
+            "/home/astro/zhaoc/local/lib/gcc/x86_64-pc-linux-gnu/10.3.0/include-fixed"
         ],
         "language": "c++",
         "libraries": [
@@ -39,9 +30,9 @@
             "mpfr"
         ],
         "library_dirs": [
-            "/usr/local/lib",
-            "/usr/lib/x86_64-linux-gnu",
-            "/home/daniel/anaconda3/envs/dive/lib"
+            "/home/astro/dforero/lib/CGAL-5.2.2/build/lib",
+            "/home/astro/zhaoc/local/lib",
+            "/home/astro/zhaoc/local/lib64"
         ],
         "name": "pydive.pydive",
         "sources": [
@@ -9952,7 +9943,7 @@ static PyObject *__pyx_pf_6pydive_6pydive_24get_void_catalog_cgal(CYTHON_UNUSED 
  *         assert box_size is not None
  *         assert cpy_range is not None             # <<<<<<<<<<<<<<
  *         voids = cdelaunay_periodic(in_x, in_y, in_z, box_size, cpy_range)
- *     cdef size_t n_simplices
+ * 
  */
     #ifndef CYTHON_WITHOUT_ASSERTIONS
     if (unlikely(!Py_OptimizeFlag)) {
@@ -9971,15 +9962,15 @@ static PyObject *__pyx_pf_6pydive_6pydive_24get_void_catalog_cgal(CYTHON_UNUSED 
  *         assert box_size is not None
  *         assert cpy_range is not None
  *         voids = cdelaunay_periodic(in_x, in_y, in_z, box_size, cpy_range)             # <<<<<<<<<<<<<<
+ * 
  *     cdef size_t n_simplices
- *     in_x.clear()
  */
     __pyx_v_voids = cdelaunay_periodic(__pyx_v_in_x, __pyx_v_in_y, __pyx_v_in_z, __pyx_v_box_size, __pyx_v_cpy_range);
   }
   __pyx_L5:;
 
-  /* "pydive/pydive.pyx":808
- *         voids = cdelaunay_periodic(in_x, in_y, in_z, box_size, cpy_range)
+  /* "pydive/pydive.pyx":809
+ * 
  *     cdef size_t n_simplices
  *     in_x.clear()             # <<<<<<<<<<<<<<
  *     in_y.clear()
@@ -9987,7 +9978,7 @@ static PyObject *__pyx_pf_6pydive_6pydive_24get_void_catalog_cgal(CYTHON_UNUSED 
  */
   __pyx_v_in_x.clear();
 
-  /* "pydive/pydive.pyx":809
+  /* "pydive/pydive.pyx":810
  *     cdef size_t n_simplices
  *     in_x.clear()
  *     in_y.clear()             # <<<<<<<<<<<<<<
@@ -9996,7 +9987,7 @@ static PyObject *__pyx_pf_6pydive_6pydive_24get_void_catalog_cgal(CYTHON_UNUSED 
  */
   __pyx_v_in_y.clear();
 
-  /* "pydive/pydive.pyx":810
+  /* "pydive/pydive.pyx":811
  *     in_x.clear()
  *     in_y.clear()
  *     in_z.clear()             # <<<<<<<<<<<<<<
@@ -10005,7 +9996,7 @@ static PyObject *__pyx_pf_6pydive_6pydive_24get_void_catalog_cgal(CYTHON_UNUSED 
  */
   __pyx_v_in_z.clear();
 
-  /* "pydive/pydive.pyx":812
+  /* "pydive/pydive.pyx":813
  *     in_z.clear()
  * 
  *     n_simplices = voids.n_simplices             # <<<<<<<<<<<<<<
@@ -10015,21 +10006,21 @@ static PyObject *__pyx_pf_6pydive_6pydive_24get_void_catalog_cgal(CYTHON_UNUSED 
   __pyx_t_8 = __pyx_v_voids.n_simplices;
   __pyx_v_n_simplices = __pyx_t_8;
 
-  /* "pydive/pydive.pyx":814
+  /* "pydive/pydive.pyx":815
  *     n_simplices = voids.n_simplices
  * 
  *     output = np.zeros((n_simplices, 4), dtype=np.double)             # <<<<<<<<<<<<<<
  * 
  *     for k in range(n_simplices):
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_np); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 814, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_np); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 815, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_zeros); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 814, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_zeros); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 815, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_7 = __Pyx_PyInt_FromSize_t(__pyx_v_n_simplices); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 814, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyInt_FromSize_t(__pyx_v_n_simplices); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 815, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_10 = PyTuple_New(2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 814, __pyx_L1_error)
+  __pyx_t_10 = PyTuple_New(2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 815, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
   __Pyx_GIVEREF(__pyx_t_7);
   PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_7);
@@ -10037,21 +10028,21 @@ static PyObject *__pyx_pf_6pydive_6pydive_24get_void_catalog_cgal(CYTHON_UNUSED 
   __Pyx_GIVEREF(__pyx_int_4);
   PyTuple_SET_ITEM(__pyx_t_10, 1, __pyx_int_4);
   __pyx_t_7 = 0;
-  __pyx_t_7 = PyTuple_New(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 814, __pyx_L1_error)
+  __pyx_t_7 = PyTuple_New(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 815, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_GIVEREF(__pyx_t_10);
   PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_10);
   __pyx_t_10 = 0;
-  __pyx_t_10 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 814, __pyx_L1_error)
+  __pyx_t_10 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 815, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
-  __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_np); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 814, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_np); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 815, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
-  __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_double); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 814, __pyx_L1_error)
+  __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_double); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 815, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
   __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-  if (PyDict_SetItem(__pyx_t_10, __pyx_n_s_dtype, __pyx_t_12) < 0) __PYX_ERR(0, 814, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_10, __pyx_n_s_dtype, __pyx_t_12) < 0) __PYX_ERR(0, 815, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-  __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_7, __pyx_t_10); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 814, __pyx_L1_error)
+  __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_7, __pyx_t_10); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 815, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
   __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -10059,7 +10050,7 @@ static PyObject *__pyx_pf_6pydive_6pydive_24get_void_catalog_cgal(CYTHON_UNUSED 
   __pyx_v_output = __pyx_t_12;
   __pyx_t_12 = 0;
 
-  /* "pydive/pydive.pyx":816
+  /* "pydive/pydive.pyx":817
  *     output = np.zeros((n_simplices, 4), dtype=np.double)
  * 
  *     for k in range(n_simplices):             # <<<<<<<<<<<<<<
@@ -10071,18 +10062,18 @@ static PyObject *__pyx_pf_6pydive_6pydive_24get_void_catalog_cgal(CYTHON_UNUSED 
   for (__pyx_t_1 = 0; __pyx_t_1 < __pyx_t_13; __pyx_t_1+=1) {
     __pyx_v_k = __pyx_t_1;
 
-    /* "pydive/pydive.pyx":817
+    /* "pydive/pydive.pyx":818
  * 
  *     for k in range(n_simplices):
  *         output[k,0] = voids.x[k]             # <<<<<<<<<<<<<<
  *         output[k,1] = voids.y[k]
  *         output[k,2] = voids.z[k]
  */
-    __pyx_t_12 = PyFloat_FromDouble((__pyx_v_voids.x[__pyx_v_k])); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 817, __pyx_L1_error)
+    __pyx_t_12 = PyFloat_FromDouble((__pyx_v_voids.x[__pyx_v_k])); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 818, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
-    __pyx_t_10 = PyInt_FromSsize_t(__pyx_v_k); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 817, __pyx_L1_error)
+    __pyx_t_10 = PyInt_FromSsize_t(__pyx_v_k); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 818, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
-    __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 817, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 818, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_GIVEREF(__pyx_t_10);
     PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_10);
@@ -10090,22 +10081,22 @@ static PyObject *__pyx_pf_6pydive_6pydive_24get_void_catalog_cgal(CYTHON_UNUSED 
     __Pyx_GIVEREF(__pyx_int_0);
     PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_int_0);
     __pyx_t_10 = 0;
-    if (unlikely(PyObject_SetItem(__pyx_v_output, __pyx_t_7, __pyx_t_12) < 0)) __PYX_ERR(0, 817, __pyx_L1_error)
+    if (unlikely(PyObject_SetItem(__pyx_v_output, __pyx_t_7, __pyx_t_12) < 0)) __PYX_ERR(0, 818, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
-    /* "pydive/pydive.pyx":818
+    /* "pydive/pydive.pyx":819
  *     for k in range(n_simplices):
  *         output[k,0] = voids.x[k]
  *         output[k,1] = voids.y[k]             # <<<<<<<<<<<<<<
  *         output[k,2] = voids.z[k]
  *         output[k,3] = voids.r[k]
  */
-    __pyx_t_12 = PyFloat_FromDouble((__pyx_v_voids.y[__pyx_v_k])); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 818, __pyx_L1_error)
+    __pyx_t_12 = PyFloat_FromDouble((__pyx_v_voids.y[__pyx_v_k])); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 819, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
-    __pyx_t_7 = PyInt_FromSsize_t(__pyx_v_k); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 818, __pyx_L1_error)
+    __pyx_t_7 = PyInt_FromSsize_t(__pyx_v_k); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 819, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_10 = PyTuple_New(2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 818, __pyx_L1_error)
+    __pyx_t_10 = PyTuple_New(2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 819, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
     __Pyx_GIVEREF(__pyx_t_7);
     PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_7);
@@ -10113,22 +10104,22 @@ static PyObject *__pyx_pf_6pydive_6pydive_24get_void_catalog_cgal(CYTHON_UNUSED 
     __Pyx_GIVEREF(__pyx_int_1);
     PyTuple_SET_ITEM(__pyx_t_10, 1, __pyx_int_1);
     __pyx_t_7 = 0;
-    if (unlikely(PyObject_SetItem(__pyx_v_output, __pyx_t_10, __pyx_t_12) < 0)) __PYX_ERR(0, 818, __pyx_L1_error)
+    if (unlikely(PyObject_SetItem(__pyx_v_output, __pyx_t_10, __pyx_t_12) < 0)) __PYX_ERR(0, 819, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
-    /* "pydive/pydive.pyx":819
+    /* "pydive/pydive.pyx":820
  *         output[k,0] = voids.x[k]
  *         output[k,1] = voids.y[k]
  *         output[k,2] = voids.z[k]             # <<<<<<<<<<<<<<
  *         output[k,3] = voids.r[k]
  * 
  */
-    __pyx_t_12 = PyFloat_FromDouble((__pyx_v_voids.z[__pyx_v_k])); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 819, __pyx_L1_error)
+    __pyx_t_12 = PyFloat_FromDouble((__pyx_v_voids.z[__pyx_v_k])); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 820, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
-    __pyx_t_10 = PyInt_FromSsize_t(__pyx_v_k); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 819, __pyx_L1_error)
+    __pyx_t_10 = PyInt_FromSsize_t(__pyx_v_k); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 820, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
-    __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 819, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 820, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_GIVEREF(__pyx_t_10);
     PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_10);
@@ -10136,22 +10127,22 @@ static PyObject *__pyx_pf_6pydive_6pydive_24get_void_catalog_cgal(CYTHON_UNUSED 
     __Pyx_GIVEREF(__pyx_int_2);
     PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_int_2);
     __pyx_t_10 = 0;
-    if (unlikely(PyObject_SetItem(__pyx_v_output, __pyx_t_7, __pyx_t_12) < 0)) __PYX_ERR(0, 819, __pyx_L1_error)
+    if (unlikely(PyObject_SetItem(__pyx_v_output, __pyx_t_7, __pyx_t_12) < 0)) __PYX_ERR(0, 820, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
-    /* "pydive/pydive.pyx":820
+    /* "pydive/pydive.pyx":821
  *         output[k,1] = voids.y[k]
  *         output[k,2] = voids.z[k]
  *         output[k,3] = voids.r[k]             # <<<<<<<<<<<<<<
  * 
  * 
  */
-    __pyx_t_12 = PyFloat_FromDouble((__pyx_v_voids.r[__pyx_v_k])); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 820, __pyx_L1_error)
+    __pyx_t_12 = PyFloat_FromDouble((__pyx_v_voids.r[__pyx_v_k])); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 821, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
-    __pyx_t_7 = PyInt_FromSsize_t(__pyx_v_k); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 820, __pyx_L1_error)
+    __pyx_t_7 = PyInt_FromSsize_t(__pyx_v_k); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 821, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_10 = PyTuple_New(2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 820, __pyx_L1_error)
+    __pyx_t_10 = PyTuple_New(2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 821, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
     __Pyx_GIVEREF(__pyx_t_7);
     PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_7);
@@ -10159,12 +10150,12 @@ static PyObject *__pyx_pf_6pydive_6pydive_24get_void_catalog_cgal(CYTHON_UNUSED 
     __Pyx_GIVEREF(__pyx_int_3);
     PyTuple_SET_ITEM(__pyx_t_10, 1, __pyx_int_3);
     __pyx_t_7 = 0;
-    if (unlikely(PyObject_SetItem(__pyx_v_output, __pyx_t_10, __pyx_t_12) < 0)) __PYX_ERR(0, 820, __pyx_L1_error)
+    if (unlikely(PyObject_SetItem(__pyx_v_output, __pyx_t_10, __pyx_t_12) < 0)) __PYX_ERR(0, 821, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
   }
 
-  /* "pydive/pydive.pyx":824
+  /* "pydive/pydive.pyx":825
  * 
  * 
  *     return output             # <<<<<<<<<<<<<<

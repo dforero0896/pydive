@@ -1,8 +1,10 @@
 import numpy as np
 import sys, time, os
-sys.path.append("./pydive")
+sys.path.append("/home/astro/dforero/codes/pydive/pydive")
 from pydive.pydive import get_void_catalog_cgal, get_void_catalog, extend_boundaries_box
 from scipy.spatial import Delaunay
+import matplotlib as mpl
+mpl.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 
@@ -11,11 +13,14 @@ if __name__ == '__main__':
     np.random.seed(42)
     points_raw = np.random.random((N,3)) * 2500
     s = time.time()
-    points = extend_boundaries_box(points_raw, box_size=2500, cpy_range=100).astype(np.double)
-    #points = points_raw
+    periodic=True
+    if periodic:
+        points = extend_boundaries_box(points_raw, box_size=2500, cpy_range=100).astype(np.double)
+    else:
+        points = points_raw
     print(f"Duplicating boundaries took {time.time() - s} s")
     s = time.time()
-    voids = get_void_catalog_cgal(points_raw, periodic=True, box_size=2500, cpy_range=40)
+    voids = get_void_catalog_cgal(points_raw, periodic=periodic, box_size=2500, cpy_range=100)
     mask = (voids[:,:3] > 0).all(axis=1) & (voids[:,:3] < 2500).all(axis=1)
     voids = voids[mask]
     print(f"CGAL took {time.time() - s} s")
