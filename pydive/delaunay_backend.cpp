@@ -3,6 +3,7 @@
 #include <CGAL/Delaunay_triangulation_3.h>
 #include <CGAL/Periodic_3_Delaunay_triangulation_3.h>
 #include <CGAL/Sphere_3.h>
+#include <CGAL/Tetrahedron_3.h>
 
 #include <vector>
 #include <set>
@@ -23,9 +24,10 @@ typedef Delaunay::Vertex_handle Vertex_handle;
 typedef K::FT FT;
 typedef CGAL::Point_3<K> Point_3;
 typedef CGAL::Sphere_3<K> Sphere_3;
+typedef CGAL::Tetrahedron_3<K> Tetrahedron_3;
 
 struct VertexList{
-    std::vector<size_t> v1, v2, v3, v4;
+    std::vector<size_t> v;
 };
 
 class DelaunayOutput{
@@ -34,22 +36,108 @@ class DelaunayOutput{
         std::vector<double> y;
         std::vector<double> z;
         std::vector<double> r;
-        VertexList vertices[4];
+        std::vector<double> volume;
+        std::vector<double> dtfe;
+        std::vector<double> weights;
+        std::vector<double> selection;
+        std::vector<size_t> vertices[4];
         size_t n_simplices;
+        
 
 };
 
 
-
-DelaunayOutput cdelaunay(std::vector<double> X, std::vector<double> Y, std::vector<double> Z){
-
-    DelaunayOutput output;
-    std::vector< std::pair<Point,size_t> >points;
-    std::vector<Point> Pin;
-    std::vector<Sphere_3> SP;
+void tesselation_to_voids(DelaunayOutput *output, Delaunay* tess){
     Point_3 simplex_vertices[4];
     Sphere_3 buffer_sphere;
     Point_3 buffer_point;
+
+    std::cout<<"==> Number of vertices: "<<tess->number_of_vertices()<<std::endl;
+    std::cout<<"==> Number of all cells: "<<tess->number_of_cells()<<std::endl;
+    std::cout<<"==> Number of finite cells: "<<tess->number_of_finite_cells()<<std::endl;
+    output->n_simplices = tess->number_of_finite_cells();
+    
+    output->x.reserve(tess->number_of_finite_cells());
+    output->y.reserve(tess->number_of_finite_cells());
+    output->z.reserve(tess->number_of_finite_cells());
+    output->r.reserve(tess->number_of_finite_cells());
+  
+    std::size_t k = 0;
+    std::size_t i;
+    for(Delaunay::Finite_cells_iterator cell=tess->finite_cells_begin();cell!=tess->finite_cells_end();cell++) {
+        
+        for(i=0;i<4;i++){
+            simplex_vertices[i] = cell->vertex(i)->point();
+            output->vertices[i].push_back(cell->vertex(i)->info());
+        }
+        
+        buffer_sphere = Sphere_3(simplex_vertices[0],simplex_vertices[1],simplex_vertices[2],simplex_vertices[3]);
+        buffer_point = buffer_sphere.center();
+        output->x[k] = CGAL::to_double(buffer_point.x());
+        output->y[k] = CGAL::to_double(buffer_point.y());
+        output->z[k] = CGAL::to_double(buffer_point.z());
+        output->r[k] = CGAL::sqrt(CGAL::to_double(buffer_sphere.squared_radius()));
+
+        k++;
+    }
+}
+
+void tesselation_to_voids_w_dtfe(DelaunayOutput *output, Delaunay* tess){
+    Point_3 simplex_vertices[4];
+    Sphere_3 buffer_sphere;
+    Point_3 buffer_point;
+    Tetrahedron_3 buffer_tetrahedron;
+
+    std::cout<<"==> Number of vertices: "<<tess->number_of_vertices()<<std::endl;
+    std::cout<<"==> Number of all cells: "<<tess->number_of_cells()<<std::endl;
+    std::cout<<"==> Number of finite cells: "<<tess->number_of_finite_cells()<<std::endl;
+    output->n_simplices = tess->number_of_finite_cells();
+    
+    output->x.reserve(tess->number_of_finite_cells());
+    output->y.reserve(tess->number_of_finite_cells());
+    output->z.reserve(tess->number_of_finite_cells());
+    output->r.reserve(tess->number_of_finite_cells());
+    output->volume.reserve(tess->number_of_finite_cells());
+    output->dtfe.reserve(tess->number_of_vertices());
+  
+    std::size_t k = 0;
+    std::size_t i;
+    for(i=0; i<tess->number_of_vertices();i++){
+        output->dtfe[i] = 0;
+    }
+    for(Delaunay::Finite_cells_iterator cell=tess->finite_cells_begin();cell!=tess->finite_cells_end();cell++) {
+        
+        for(i=0;i<4;i++){
+            simplex_vertices[i] = cell->vertex(i)->point();
+            output->vertices[i].push_back(cell->vertex(i)->info());
+        }
+        
+        buffer_sphere = Sphere_3(simplex_vertices[0],simplex_vertices[1],simplex_vertices[2],simplex_vertices[3]);
+        buffer_point = buffer_sphere.center();
+        output->x[k] = CGAL::to_double(buffer_point.x());
+        output->y[k] = CGAL::to_double(buffer_point.y());
+        output->z[k] = CGAL::to_double(buffer_point.z());
+        output->r[k] = CGAL::sqrt(CGAL::to_double(buffer_sphere.squared_radius()));
+
+        buffer_tetrahedron = Tetrahedron_3(simplex_vertices[0],simplex_vertices[1],simplex_vertices[2],simplex_vertices[3]);
+        output->volume[k] = CGAL::to_double(buffer_tetrahedron.volume());
+
+        for(i=0;i<4;i++){
+            output->dtfe[cell->vertex(i)->info()] += output->volume[k];
+        }
+
+
+        k++;
+    }
+}
+
+DelaunayOutput cdelaunay(std::vector<double> X, std::vector<double> Y, std::vector<double> Z, bool compute_dtfe){
+
+    DelaunayOutput output;
+    std::vector< std::pair<Point,size_t> >points;
+    
+    
+    
 
     std::size_t i, n_points;
     n_points = X.size();
@@ -62,56 +150,28 @@ DelaunayOutput cdelaunay(std::vector<double> X, std::vector<double> Y, std::vect
     Delaunay tess(points.begin(), points.end());
     assert(tess.is_valid());
     points.clear();
-
-    std::cout<<"==> Number of vertices: "<<tess.number_of_vertices()<<std::endl;
-    std::cout<<"==> Number of all cells: "<<tess.number_of_cells()<<std::endl;
-    std::cout<<"==> Number of finite cells: "<<tess.number_of_finite_cells()<<std::endl;
-    output.n_simplices = tess.number_of_finite_cells();
     
-    output.x.reserve(tess.number_of_finite_cells());
-    output.y.reserve(tess.number_of_finite_cells());
-    output.z.reserve(tess.number_of_finite_cells());
-    output.r.reserve(tess.number_of_finite_cells());
-
-    std::set<Cell*> cell_set; //To get incident cells on vertices for DTFE
     
-
-    std::size_t k = 0;
-    for(Delaunay::Finite_cells_iterator cell=tess.finite_cells_begin();cell!=tess.finite_cells_end();cell++) {
-        
-        for(i=0;i<4;i++){
-            simplex_vertices[i] = cell->vertex(i)->point();
-            output.vertices[i].v1.push_back(cell->vertex(i)->info());
-        }        
-        buffer_sphere = Sphere_3(simplex_vertices[0],simplex_vertices[1],simplex_vertices[2],simplex_vertices[3]);
-        buffer_point = buffer_sphere.center();
-        output.x[k] = CGAL::to_double(buffer_point.x());
-        output.y[k] = CGAL::to_double(buffer_point.y());
-        output.z[k] = CGAL::to_double(buffer_point.z());
-        output.r[k] = CGAL::sqrt(CGAL::to_double(buffer_sphere.squared_radius()));
-
-        k++;
+    if (compute_dtfe){
+        tesselation_to_voids_w_dtfe(&output, &tess);
     }
-    
+    else{
+        tesselation_to_voids(&output, &tess);
+    }
     
     return output;
 
 }
 
 
-DelaunayOutput cdelaunay_periodic(std::vector<double> X, std::vector<double> Y, std::vector<double> Z, double box_size, double cpy_range){
+DelaunayOutput cdelaunay_periodic(std::vector<double> X, std::vector<double> Y, std::vector<double> Z, double box_size, double cpy_range, bool compute_dtfe){
 
     double low_range = 0;
     double high_range = low_range + box_size;
     std::size_t size;
     DelaunayOutput output;
     std::vector< std::pair<Point,size_t> >points;
-    std::vector<Point> Pin;
-    std::vector<Sphere_3> SP;
-    Point_3 simplex_vertices[4];
-    Sphere_3 buffer_sphere;
-    Point_3 buffer_point;
-
+    
     std::size_t i, n_points;
     n_points = X.size();
     for (i=0; i<n_points; i++){
@@ -158,43 +218,16 @@ DelaunayOutput cdelaunay_periodic(std::vector<double> X, std::vector<double> Y, 
     Delaunay tess(points.begin(), points.end());
     assert(tess.is_valid());
     points.clear();
-
-    std::cout<<"==> Number of vertices: "<<tess.number_of_vertices()<<std::endl;
-    std::cout<<"==> Number of all cells: "<<tess.number_of_cells()<<std::endl;
-    std::cout<<"==> Number of finite cells: "<<tess.number_of_finite_cells()<<std::endl<<std::endl;
-    output.n_simplices = tess.number_of_finite_cells();
     
-    output.x.reserve(tess.number_of_finite_cells());
-    output.y.reserve(tess.number_of_finite_cells());
-    output.z.reserve(tess.number_of_finite_cells());
-    output.r.reserve(tess.number_of_finite_cells());
-
-    std::set<Cell*> cell_set; //To get incident cells on vertices for DTFE
-    
-
-    std::size_t k = 0;
-    for(Delaunay::Finite_cells_iterator cell=tess.finite_cells_begin();cell!=tess.finite_cells_end();cell++) {
-        
-        for(i=0;i<4;i++){
-            simplex_vertices[i] = cell->vertex(i)->point();
-            output.vertices[i].v1.push_back(cell->vertex(i)->info());
-        }
-        
-        buffer_sphere = Sphere_3(simplex_vertices[0],simplex_vertices[1],simplex_vertices[2],simplex_vertices[3]);
-        buffer_point = buffer_sphere.center();
-        output.x[k] = CGAL::to_double(buffer_point.x());
-        output.y[k] = CGAL::to_double(buffer_point.y());
-        output.z[k] = CGAL::to_double(buffer_point.z());
-        output.r[k] = CGAL::sqrt(CGAL::to_double(buffer_sphere.squared_radius()));
-
-        k++;
+    if (compute_dtfe){
+        tesselation_to_voids_w_dtfe(&output, &tess);
     }
-    
-    
+    else{
+        tesselation_to_voids(&output, &tess);
+    }
     return output;
 
 }
-
 
 int main(){
     return 0;

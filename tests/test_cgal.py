@@ -7,20 +7,29 @@ import matplotlib as mpl
 mpl.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
-
+# make sure to add CGAL to LD_LIBRARY_PATH
 if __name__ == '__main__':
     N = int(1e5)
     np.random.seed(42)
-    points_raw = np.random.random((N,3)) * 2500
+    points_raw = np.random.random((N,4)) * 2500
+    buffer_ones = np.ones_like(points_raw[:,0])
     s = time.time()
     periodic=True
+    compute_dtfe = False
     if periodic:
         points = extend_boundaries_box(points_raw, box_size=2500, cpy_range=100).astype(np.double)
     else:
         points = points_raw
     print(f"Duplicating boundaries took {time.time() - s} s")
     s = time.time()
-    voids = get_void_catalog_cgal(points_raw, periodic=periodic, box_size=2500, cpy_range=100)
+    voids = get_void_catalog_cgal(points_raw, 
+                                periodic=periodic, 
+                                box_size=2500, 
+                                cpy_range=100, 
+                                compute_dtfe=compute_dtfe,
+                                weights = buffer_ones,
+                                selection = buffer_ones,
+                                average_density = points_raw.shape[0] / 2500**3)
     mask = (voids[:,:3] > 0).all(axis=1) & (voids[:,:3] < 2500).all(axis=1)
     voids = voids[mask]
     print(f"CGAL took {time.time() - s} s")
@@ -38,7 +47,7 @@ if __name__ == '__main__':
         axr[i].legend()
 
     s = time.time()
-    tess = Delaunay(points)
+    tess = Delaunay(points[:,:3])
     vertices = tess.points[tess.simplices[:,:], :]
     n_simplices = vertices.shape[0]
     voids = np.zeros((n_simplices, 4), dtype=np.double)

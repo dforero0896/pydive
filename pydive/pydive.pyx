@@ -109,10 +109,10 @@ cdef extern from "gsl/gsl_linalg.h":
 
 cdef extern from "delaunay_backend.cpp":
     cdef cppclass DelaunayOutput:
-        vector[double] x, y, z, r
+        vector[double] x, y, z, r, volume, dtfe
         size_t n_simplices
-    DelaunayOutput cdelaunay(vector[double] X, vector[double] Y, vector[double] Z) nogil
-    DelaunayOutput cdelaunay_periodic(vector[double] X, vector[double] Y, vector[double] Z, double box_size, double cpy_range) nogil
+    DelaunayOutput cdelaunay(vector[double] X, vector[double] Y, vector[double] Z, bint compute_dtfe) nogil
+    DelaunayOutput cdelaunay_periodic(vector[double] X, vector[double] Y, vector[double] Z, double box_size, double cpy_range, bint compute_dtfe) nogil
 
 ######################################### DT void catalog computations ##############################################
 
@@ -784,10 +784,17 @@ def extend_boundaries_box(points, box_size=2500, cpy_range=80, low_range=0):
 def get_void_catalog_cgal(double[:,:] points,
                         bint periodic=False,
                         double box_size = 1000,
-                        double cpy_range = 40):
+                        double cpy_range = 40,
+                        bint compute_dtfe=False,
+                        double[:] weights = None,
+                        double[:] selection = None,
+                        double average_density = 1):
 
     cdef Py_ssize_t i,k
     cdef vector[double] in_x, in_y, in_z
+    
+    
+    
     in_x.reserve(points.shape[0])
     in_y.reserve(points.shape[0])
     in_z.reserve(points.shape[0])
@@ -799,11 +806,11 @@ def get_void_catalog_cgal(double[:,:] points,
     
     cdef DelaunayOutput voids
     if not periodic:
-        voids = cdelaunay(in_x, in_y, in_z)
+        voids = cdelaunay(in_x, in_y, in_z, compute_dtfe)
     else:
         assert box_size is not None
         assert cpy_range is not None
-        voids = cdelaunay_periodic(in_x, in_y, in_z, box_size, cpy_range)
+        voids = cdelaunay_periodic(in_x, in_y, in_z, box_size, cpy_range, compute_dtfe)
         
     cdef size_t n_simplices
     in_x.clear()
@@ -811,15 +818,16 @@ def get_void_catalog_cgal(double[:,:] points,
     in_z.clear()
     
     n_simplices = voids.n_simplices
-
     output = np.zeros((n_simplices, 4), dtype=np.double)
-    
     for k in range(n_simplices):
         output[k,0] = voids.x[k]
         output[k,1] = voids.y[k]
         output[k,2] = voids.z[k]
         output[k,3] = voids.r[k]
+    
+    if compute_dtfe:
+        
+        for k in range(points.shape[0]):
+            points[i,3] = 4. * weights[k] / (average_density * selection[k] * voids.dtfe[k])
 
-    
-    
     return output
