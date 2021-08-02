@@ -14,7 +14,7 @@ For information about the motivation, references and original implementation, pl
 CGAL backend:
 ```python
 sys.path.append("/home/astro/dforero/codes/pydive/pydive") # add library location to path
-from pydive.pydive import get_void_catalog, extend_boundaries_box
+from pydive.pydive import get_void_catalog_cgal
 from scipy.spatial import Delaunay
 N = int(1e5)
 np.random.seed(42)
