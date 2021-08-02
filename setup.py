@@ -38,6 +38,6 @@ myext = Extension("pydive.pydive",
              )
 
 setup(name='pydive',
-    author="Daniel Forero & Cheng Zhao",
+    author="Daniel Forero",
     packages=find_packages(),
     ext_modules=cythonize([myext]))
