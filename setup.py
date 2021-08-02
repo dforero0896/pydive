@@ -1,6 +1,12 @@
 from setuptools import setup, Extension, find_packages
 from Cython.Build import cythonize
 import numpy
+import os
+os.environ["CC"]="/home/astro/zhaoc/local/bin/gcc"
+os.environ["CXX"]="/home/astro/zhaoc/local/bin/g++"
+print(os.environ['LD_LIBRARY_PATH'])
+print(os.environ['PATH'])
+
 
 extra_compile_args=['-fPIC']
 extra_link_args=[]
@@ -11,11 +17,22 @@ if OMP:
 
 
 myext = Extension("pydive.pydive",
-                  sources=['pydive/pydive.pyx'],
-                  include_dirs=[numpy.get_include(), '/usr/include', '/global/common/sw/cray/cnl7/haswell/gsl/2.5/intel/19.0.3.199/7twqxxq/include'],
-                  library_dirs=['/usr/lib/x86_64-linux-gnu', '/global/common/sw/cray/cnl7/haswell/gsl/2.5/intel/19.0.3.199/7twqxxq/lib'],
-                  libraries=['m', 'gsl', 'gslcblas'],
-                  language='c',
+                  sources=['pydive/pydive.pyx',
+                            #'pydive/delaunay_backend.cpp'
+                            ],
+                  include_dirs=[numpy.get_include(), 
+                                '/home/astro/dforero/lib/CGAL-5.2.2/include', 
+                                '/home/astro/zhaoc/local/lib/gcc/x86_64-pc-linux-gnu/10.3.0/include',
+                                '/home/astro/zhaoc/local/lib/gcc/x86_64-pc-linux-gnu/10.3.0/include-fixed'
+                                ],
+                                
+                  library_dirs=[
+                                '/home/astro/dforero/lib/CGAL-5.2.2/build/lib',
+                                '/home/astro/zhaoc/local/lib',
+                                '/home/astro/zhaoc/local/lib64'
+                                ],
+                  libraries=['m', 'gsl', 'gslcblas', 'CGAL', 'gmp', 'mpfr'],
+                  language='c++',
                   extra_compile_args=extra_compile_args,
                   extra_link_args=extra_link_args
              )
