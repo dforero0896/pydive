@@ -11,3 +11,4 @@ tests/CAT*
 *.dat
 *.png
 *.log
+*.ipynb
