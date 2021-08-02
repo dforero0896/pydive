@@ -12,3 +12,6 @@ tests/CAT*
 *.png
 *.log
 *.ipynb
+*.conf
+*.dat
+*.npy
