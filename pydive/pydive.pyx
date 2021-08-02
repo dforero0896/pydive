@@ -828,6 +828,6 @@ def get_void_catalog_cgal(double[:,:] points,
     if compute_dtfe:
         
         for k in range(points.shape[0]):
-            points[i,3] = 4. * weights[k] / (average_density * selection[k] * voids.dtfe[k])
+            points[k,3] = 4. * weights[k] / (average_density * selection[k] * voids.dtfe[k])
 
     return output

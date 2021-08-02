@@ -105,6 +105,7 @@ void tesselation_to_voids_w_dtfe(DelaunayOutput *output, Delaunay* tess){
     for(i=0; i<tess->number_of_vertices();i++){
         output->dtfe[i] = 0;
     }
+    std::cout<<"==> Computing void centers and radii."<<std::endl;
     for(Delaunay::Finite_cells_iterator cell=tess->finite_cells_begin();cell!=tess->finite_cells_end();cell++) {
         
         for(i=0;i<4;i++){
@@ -121,7 +122,7 @@ void tesselation_to_voids_w_dtfe(DelaunayOutput *output, Delaunay* tess){
 
         buffer_tetrahedron = Tetrahedron_3(simplex_vertices[0],simplex_vertices[1],simplex_vertices[2],simplex_vertices[3]);
         output->volume[k] = CGAL::to_double(buffer_tetrahedron.volume());
-
+        
         for(i=0;i<4;i++){
             output->dtfe[cell->vertex(i)->info()] += output->volume[k];
         }

@@ -10249,7 +10249,7 @@ static PyObject *__pyx_pf_6pydive_6pydive_24get_void_catalog_cgal(CYTHON_UNUSED 
  *     if compute_dtfe:
  * 
  *         for k in range(points.shape[0]):             # <<<<<<<<<<<<<<
- *             points[i,3] = 4. * weights[k] / (average_density * selection[k] * voids.dtfe[k])
+ *             points[k,3] = 4. * weights[k] / (average_density * selection[k] * voids.dtfe[k])
  * 
  */
     __pyx_t_1 = (__pyx_v_points.shape[0]);
@@ -10260,7 +10260,7 @@ static PyObject *__pyx_pf_6pydive_6pydive_24get_void_catalog_cgal(CYTHON_UNUSED 
       /* "pydive/pydive.pyx":831
  * 
  *         for k in range(points.shape[0]):
- *             points[i,3] = 4. * weights[k] / (average_density * selection[k] * voids.dtfe[k])             # <<<<<<<<<<<<<<
+ *             points[k,3] = 4. * weights[k] / (average_density * selection[k] * voids.dtfe[k])             # <<<<<<<<<<<<<<
  * 
  *     return output
  */
@@ -10274,7 +10274,7 @@ static PyObject *__pyx_pf_6pydive_6pydive_24get_void_catalog_cgal(CYTHON_UNUSED 
         PyErr_SetString(PyExc_ZeroDivisionError, "float division");
         __PYX_ERR(0, 831, __pyx_L1_error)
       }
-      __pyx_t_5 = __pyx_v_i;
+      __pyx_t_5 = __pyx_v_k;
       __pyx_t_4 = 3;
       if (__pyx_t_5 < 0) __pyx_t_5 += __pyx_v_points.shape[0];
       if (__pyx_t_4 < 0) __pyx_t_4 += __pyx_v_points.shape[1];
@@ -10291,7 +10291,7 @@ static PyObject *__pyx_pf_6pydive_6pydive_24get_void_catalog_cgal(CYTHON_UNUSED 
   }
 
   /* "pydive/pydive.pyx":833
- *             points[i,3] = 4. * weights[k] / (average_density * selection[k] * voids.dtfe[k])
+ *             points[k,3] = 4. * weights[k] / (average_density * selection[k] * voids.dtfe[k])
  * 
  *     return output             # <<<<<<<<<<<<<<
  */
