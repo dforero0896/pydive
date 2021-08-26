@@ -478,7 +478,7 @@ DelaunayOutput cdelaunay_periodic_full(std::vector<double> X, std::vector<double
     
     double point_density = n_points / (box_size[0] * box_size[1] * box_size[2]);
     double mean_free_path = pow(point_density, -1./3);
-    double cpy_range = 2 * mean_free_path;
+    double cpy_range = 2.5 * mean_free_path;
 
     std::cout << "==> Point density: " << point_density << " (h/Mpc)^3" << std::endl;
     std::cout << "==> Domain volume: " << (box_size[0] * box_size[1] * box_size[2]) << " (Mpc/h)^3" << std::endl;

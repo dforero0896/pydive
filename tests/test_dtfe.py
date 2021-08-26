@@ -41,7 +41,7 @@ def pickle_loader(filename):
 
 # make sure to add CGAL to LD_LIBRARY_PATH
 if __name__ == '__main__':
-    N = int(1e5)
+    N = int(1e4)
     np.random.seed(42)
     points_raw = np.random.random((N,4)) * BOX_SIZE
     buffer_ones = np.ones_like(points_raw[:,0])
@@ -70,9 +70,15 @@ if __name__ == '__main__':
     #interp = NearestNDInterpolator(points, values)
     density_dtfe_linterp = interp(X.reshape(-1), Y.reshape(-1), Z.reshape(-1))
     density_dtfe_linterp = np.einsum('ijk->jik', density_dtfe_linterp.reshape((GRID_SIZE, GRID_SIZE, GRID_SIZE)))
-    density_dtfe_linterp /= np.mean(density_dtfe_linterp, dtype=np.float64);  density_dtfe_linterp -= 1.0
+    mean = np.mean(density_dtfe_linterp, dtype=np.float64)
+    print("Mean density at galaxies", mean)
+    print("Mean density at voids", voids[:,5].mean())
+    density_dtfe_linterp /= mean;  density_dtfe_linterp -= 1.0
 
+    mean = voids[:,5].mean()
 
+    void_delta = (voids[:,5]/mean) - 1
+    
     grid    = GRID_SIZE    #the 3D field will have grid x grid x grid voxels
     MAS     = 'CIC'  #mass-assigment scheme
     R       = 5 #Mpc.h
@@ -84,7 +90,7 @@ if __name__ == '__main__':
         density_cic_grid = np.zeros((grid,grid,grid), dtype=np.float32)
 
         # construct 3D density field
-        MASL.MA(points_raw[:,:3].astype(np.float32), density_cic_grid, BOX_SIZE, MAS, verbose=verbose)
+        MASL.MA(points_raw[:,:3].astype(np.float32), density_cic_grid, BOX_SIZE, MAS, verbose=verbose, W=-np.ones(points_raw.shape[0], dtype=np.float32))
 
         # at this point, delta contains the effective number of particles in each voxel
         # now compute overdensity and density constrast
@@ -148,6 +154,8 @@ if __name__ == '__main__':
     ax[0].legend()
 
     ax[1].hist(voids[:,3], bins=100, histtype='step', label='r')
+    for t in [0, -0.1, -0.2, -0.3, -.5]:
+        ax[1].hist(voids[void_delta[mask] < t,3], bins=100, histtype='step', label='r $\delta<%.1f$'%t)
     ax[1].legend()
 
     ax[2].hist(voids[:,4], bins=100, histtype='step', label='vol')
