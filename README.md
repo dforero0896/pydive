@@ -1,1 +1,64 @@
 # pydive
+## Python version of [DIVE](https://github.com/cheng-zhao/DIVE)
+
+
+This is the (extended) version of the DIVE code by Cheng Zhao. It is now CGAL based entirely, including features previously available only on the Scipy backend like computing simplex areas, volumes, sphericity. There are also routines available to split the void sample into central and satellite voids. 
+
+The Scipy backend has been deprecated in the latest version in favor of the faster CGAL implementation. 
+
+### Features
+To replicate the functionality of `DIVE`, one must use the function `get_void_catalog_cgal`.
+Running `pydive` on periodic boxes can now be done in two ways: With `periodic_mode=0` the boundaries of the box are extended by a distance of 3 * `(n_objects/box_volume)**(-1./3)`. This setting is much faster but uses up more memory due to the copying of points. With `periodic_mode=1` the periodic triangulation data structures in CGAL are used. For some reason this results in ~5x slower run time.
+
+In addition, one may compute other features of the triangulation. For now, you may compute simplex area, volume, DTFE density estimation (at points and void positions). In a future a feature selection could be added to improve performance. To do this on periodic boxes, only duplicating boundaries is available given that CGAL vertex info is used and that is not available for periodic triangulation vertices for now. These features are available with the `get_void_catalog_full` function. See below for use examples.
+
+## Compilation notes
+
+Given that CGAL is used in this code, the GMP, MPFR, BOOST and (of course) CGAL libraries are necessary. Given that the code is called from Python, the CGAL library must be built beforehand see the compilation/installation guide for CGAL [here](https://doc.cgal.org/latest/Manual/installation.html). When compilig `pydive` make sure to edit `setup.py` to your `lib` and `include` dirs for all libraries needed and add the flags `-gsl -gslcblas -CGAL -gmp -mpfr`
+
+For information about the motivation, references and original implementation, please visit [DIVE's repository](https://github.com/cheng-zhao/DIVE). If you use this implementation in a scientific publication, please link to this repository and cite the DIVE paper.
+
+### Usage examples
+
+`DIVE` functionality: Delaunay tesselation and computing circumsphere positions/radii.
+```python
+sys.path.append("/home/astro/dforero/codes/pydive/pydive") # add library location to path
+from pydive.pydive import get_void_catalog_cgal
+
+N = int(5e5)
+np.random.seed(42)
+points_raw = np.random.random((N,4)) * 2500
+s = time.time()
+periodic=True
+voids = get_void_catalog_cgal(points_raw, 
+                            periodic=periodic, 
+                            periodic_mode = 0
+                            )
+print(f"CGAL took {time.time() - s} s", flush=True)
+# Select points inside the original box
+mask = (voids[:,:3] > 0).all(axis=1) & (voids[:,:3] < 2500).all(axis=1)
+voids = voids[mask]
+
+```
+Computing extra features:
+```python
+sys.path.append("/home/astro/dforero/codes/pydive/pydive") # add library location to path
+from pydive.pydive import get_void_catalog_full
+
+N = int(5e5)
+np.random.seed(42)
+points_raw = np.random.random((N,4)) * 2500
+s = time.time()
+periodic=True
+voids, dtfe = get_void_catalog_full(points_raw, 
+                            periodic=periodic, 
+                            )
+# dtfe corresponds to the DTFE density estimation at point positions.
+# so far no selection function is considered but it should be in a near future
+print(f"CGAL took {time.time() - s} s", flush=True)
+# Select points inside the original box
+mask = (voids[:,:3] > 0).all(axis=1) & (voids[:,:3] < 2500).all(axis=1)
+voids = voids[mask]
+
+```
+![alt text](https://github.com/dforero0896/pydive/blob/cgal/tests/dtfe.png?raw=true)

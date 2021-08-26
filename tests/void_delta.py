@@ -22,13 +22,14 @@ import readfof
 
 HALOS="/hpcstorage/zhaoc/PATCHY_BOX/pre-recon/halo/BDM_Apk/CATALPTCICz0.562G960S1010008301.dat"
 DM_FIELD="/hpcstorage/zhaoc/PATCHY_BOX/pre-recon/DMfield/1010008301.dat"
-BOX_SIZE=1000
+BOX_SIZE=2500
 GRID_SIZE=512
 
 N = int(1e6)
 np.random.seed(42)
 points_raw = np.random.random((N,4)) * BOX_SIZE
-
+points_raw = pd.read_csv(HALOS, engine='c', delim_whitespace=True,
+                        names=['x', 'y', 'z'], usecols=(0, 1, 2)).values.astype(np.double)[:]
 
 grid    = GRID_SIZE    #the 3D field will have grid x grid x grid voxels
 MAS     = 'CIC'  #mass-assigment scheme

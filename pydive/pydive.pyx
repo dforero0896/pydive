@@ -140,7 +140,7 @@ def get_void_catalog_cgal(double[:,:] points,
     
     cdef DelaunayOutput voids
     if not periodic:
-        voids = cdelaunay_periodic(in_x, in_y, in_z)
+        voids = cdelaunay(in_x, in_y, in_z)
     else:
         if periodic_mode == 0:
             voids = cdelaunay_periodic_extend(in_x, in_y, in_z)
@@ -168,8 +168,10 @@ def get_void_catalog_cgal(double[:,:] points,
 
 @cython.wraparound(False)
 @cython.boundscheck(False)
+@cython.cdivision(True)
 def get_void_catalog_full(double[:,:] points,
                         bint periodic=False,
+                        int n_threads = 16,
                         ):
 
     cdef Py_ssize_t i,k
@@ -203,7 +205,9 @@ def get_void_catalog_full(double[:,:] points,
 
     n_simplices = voids.n_simplices
     output = np.zeros((n_simplices, 7), dtype=np.double)
-    dtfe = np.zeros((points.shape[0], 1), dtype=np.double)
+    dtfe = np.zeros(points.shape[0], dtype=np.double)
+    cdef double [:,:] output_view = output
+    cdef double [:] dtfe_view = dtfe
 
     printf("==> Computing DTFE\n")
     fflush(stdout)
@@ -211,23 +215,26 @@ def get_void_catalog_full(double[:,:] points,
         dtfe[k] = 4. / voids.dtfe[k]
     printf("==> Copying voids and interpolating\n")
     fflush(stdout)
+    p = 2
+    #for k in prange(n_simplices, nogil=True, num_threads=n_threads):
     for k in range(n_simplices):
-        output[k,0] = voids.x[k]
-        output[k,1] = voids.y[k]
-        output[k,2] = voids.z[k]
-        output[k,3] = voids.r[k]
-        output[k,4] = voids.volume[k]
-        w = 1. / voids.r[k]
+        output_view[k,0] = voids.x[k]
+        output_view[k,1] = voids.y[k]
+        output_view[k,2] = voids.z[k]
+        output_view[k,3] = voids.r[k]
+        output_view[k,4] = voids.volume[k]
+        w = 1. / voids.r[k]**p
         numerator = 0
         for i in range(4):
             if voids.vertices[i][k] < points.shape[0]:
-                numerator += w * dtfe[<size_t> voids.vertices[i][k]]
-        output[k,5] = numerator / (4 * w)
-        output[k,6] = voids.area[k]
+                numerator = numerator + w * dtfe_view[<size_t> voids.vertices[i][k]]
+        output_view[k,5] = numerator / (4 * w)
+        output_view[k,6] = voids.area[k]
         
 
 
-    
+    printf("    Done\n")
+    fflush(stdout)
         
     
 

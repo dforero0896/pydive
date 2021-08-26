@@ -13,8 +13,8 @@ if __name__ == '__main__':
     np.random.seed(42)
     points_raw = np.random.random((N,4)) * 2500
     HALOS="/hpcstorage/zhaoc/PATCHY_BOX/pre-recon/halo/BDM_Apk/CATALPTCICz0.562G960S1010008301.dat"
-    #points_raw = pd.read_csv(HALOS, engine='c', delim_whitespace=True,
-    #                    names=['x', 'y', 'z'], usecols=(0, 1, 2)).values.astype(np.double)[:]
+    points_raw = pd.read_csv(HALOS, engine='c', delim_whitespace=True,
+                        names=['x', 'y', 'z'], usecols=(0, 1, 2)).values.astype(np.double)[:]
     points_raw = np.c_[points_raw, np.zeros(points_raw.shape[0])]
     buffer_ones = np.ones_like(points_raw[:,0])
     s = time.time()
@@ -28,8 +28,9 @@ if __name__ == '__main__':
         s = time.time()
         voids = get_void_catalog_cgal(points_raw, 
                                     periodic=periodic, 
+                                    periodic_mode = 0
                                     )
-        print(f"CGAL took {time.time() - s} s")
+        print(f"CGAL took {time.time() - s} s", flush=True)
         mask = (voids[:,:3] > 0).all(axis=1) & (voids[:,:3] < 2500).all(axis=1)
         voids = voids[mask]
         

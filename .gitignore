@@ -9,3 +9,10 @@ tests/CAT*
 */.ipynb_checkpoints
 *.pkl
 *.dat
+*.png
+*.log
+*.ipynb
+*.conf
+*.dat
+*.npy
+!dtfe.png
