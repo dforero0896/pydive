@@ -355,3 +355,56 @@ def get_satellites(double[:,:] data,
                                     distances[k] = distance
 
 
+########################################## Sky to Cartesian Coordinate conversion ################################################
+
+@cython.boundscheck(False)
+cdef double comoving_dist_integrand(double x, void * params) nogil:
+
+    # Signature must match what GSL asks for in the integration.
+    # Extract parameters
+    cdef double H0 =  (<double *> params)[0]
+    cdef double OmegaL =  (<double *> params)[1]
+    cdef double OmegaM =  (<double *> params)[2]
+    cdef double c =  (<double *> params)[3]
+    #printf("%lf %lf %lf %lf\n", H0, OmegaL, OmegaM, c)
+
+    cdef double H = H0 * sqrt(OmegaL + OmegaM * pow( 1 + x , 3))
+
+    return c / H
+    
+cdef double integrate_z(double z, double H0, double OmegaL, double OmegaM) nogil :
+
+    cdef gsl_integration_workspace *w
+    cdef double result, error
+    cdef double c = SPEED_OF_LIGHT
+    cdef int prec = PREC_DIGIT
+    cdef gsl_function integrand
+    cdef double* params = [ H0, OmegaL, OmegaM, c ]
+
+    integrand.function = &comoving_dist_integrand
+    integrand.params = params
+
+    w = gsl_integration_workspace_alloc(1000)
+    gsl_integration_qag(&integrand, 0, z, 0, pow(10, -prec), 1000, GSL_INTEG_GAUSS51, w, &result, &error)
+    gsl_integration_workspace_free(w)
+
+    return result
+
+@cython.boundscheck(False)
+def sky_to_cart_parallel(double[:,:] input, double[:,:] output, int n_lines, int n_threads, double H0=67.7, double OmegaM=0.307115):
+
+    cdef double OmegaL = 1 - OmegaM
+    cdef double dist, ra, dec, h
+    h = H0 / 100
+    cdef Py_ssize_t i
+    for i in prange(n_lines, nogil=True, num_threads=n_threads):
+        dist = integrate_z(input[i,2], H0, OmegaL, OmegaM)
+        ra = input[i,0] * PI / 180
+        dec = input[i,1] * PI / 180
+        #X
+        output[i,0] = dist * cos(dec) * cos(ra) * h
+        #Y
+        output[i,1] = dist * cos(dec) * sin(ra) * h
+        #Z
+        output[i,2] = dist * sin(dec) * h
+        

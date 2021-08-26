@@ -11,10 +11,11 @@ To replicate the functionality of `DIVE`, one must use the function `get_void_ca
 Running `pydive` on periodic boxes can now be done in two ways: With `periodic_mode=0` the boundaries of the box are extended by a distance of 3 * `(n_objects/box_volume)**(-1./3)`. This setting is much faster but uses up more memory due to the copying of points. With `periodic_mode=1` the periodic triangulation data structures in CGAL are used. For some reason this results in ~5x slower run time.
 
 In addition, one may compute other features of the triangulation. For now, you may compute simplex area, volume, DTFE density estimation (at points and void positions). In a future a feature selection could be added to improve performance. To do this on periodic boxes, only duplicating boundaries is available given that CGAL vertex info is used and that is not available for periodic triangulation vertices for now. These features are available with the `get_void_catalog_full` function. See below for use examples.
+I have also added routines for sky to cartesian coordinate conversion (which use GSL).
 
 ## Compilation notes
 
-Given that CGAL is used in this code, the GMP, MPFR, BOOST and (of course) CGAL libraries are necessary. Given that the code is called from Python, the CGAL library must be built beforehand see the compilation/installation guide for CGAL [here](https://doc.cgal.org/latest/Manual/installation.html). When compilig `pydive` make sure to edit `setup.py` to your `lib` and `include` dirs for all libraries needed and add the flags `-gsl -gslcblas -CGAL -gmp -mpfr`
+Given that CGAL is used in this code, the GMP, MPFR, BOOST and (of course) CGAL libraries are necessary. Given that the code is called from Python, the CGAL library must be built beforehand see the compilation/installation guide for CGAL [here](https://doc.cgal.org/latest/Manual/installation.html). GSL is used for the coordinate conversion routines. When compilig `pydive` make sure to edit `setup.py` to your `lib` and `include` dirs for all libraries needed and add the flags `-gsl -gslcblas -CGAL -gmp -mpfr`
 
 For information about the motivation, references and original implementation, please visit [DIVE's repository](https://github.com/cheng-zhao/DIVE). If you use this implementation in a scientific publication, please link to this repository and cite the DIVE paper.
 
