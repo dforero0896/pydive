@@ -442,6 +442,144 @@ DelaunayOutput cdelaunay_full(std::vector<double> X, std::vector<double> Y, std:
 }
 
 
+DelaunayOutput cdelaunay_periodic_full(std::vector<double> X, std::vector<double> Y, std::vector<double> Z){
+
+    DelaunayOutput output;
+    std::vector< std::pair<Point,size_t> >points;
+    
+    
+    
+
+    std::size_t i, n_points, j;
+    n_points = X.size();
+
+    FT box_min[3], box_max[3];
+    double box_size[3];
+    for (i = 0; i < 3; i++){
+        box_min[i] = DOUBLE_MAX;
+        box_max[i] = DOUBLE_MIN;
+    }
+
+    double box_pad = 2.;
+    for (i=0; i<n_points; i++){
+        points.push_back(std::make_pair(Point_3(X[i], Y[i], Z[i]),i));
+        for (j = 0; j < 3; j++){
+            if (box_min[j] > points[i].first.cartesian(j)){
+                box_min[j] = points[i].first.cartesian(j) - box_pad;
+            }
+            else if (box_max[j] < points[i].first.cartesian(j)){
+                box_max[j] = points[i].first.cartesian(j) + box_pad;
+            }     
+        }
+    }
+    for (i = 0; i < 3; i++){
+        box_size[i] = CGAL::to_double(box_max[i] - box_min[i]);
+    }
+    
+    double point_density = n_points / (box_size[0] * box_size[1] * box_size[2]);
+    double mean_free_path = pow(point_density, -1./3);
+    double cpy_range = 2 * mean_free_path;
+
+    std::cout << "==> Point density: " << point_density << " (h/Mpc)^3" << std::endl;
+    std::cout << "==> Domain volume: " << (box_size[0] * box_size[1] * box_size[2]) << " (Mpc/h)^3" << std::endl;
+    std::cout << "==> Mean free path: " << mean_free_path << " Mpc/h" << std::endl;
+    std::cout << "==> Copy range: " << cpy_range << " Mpc/h" << std::endl;
+
+    size_t size = points.size();
+    std::cout<<"==> Number of points: "<<points.size()<<std::endl<<std::endl;
+    size_t point_count = n_points;
+    std::cout<<"Duplicating boundaries for periodic condition"<<std::endl;
+    for(i=0;i<size;i++)
+        if(points[i].first.x()<box_min[0]+cpy_range){
+            points.push_back(std::make_pair(Point_3(points[i].first.x()+box_size[0],points[i].first.y(),points[i].first.z()), point_count++));
+        }
+    size=points.size();
+    for(i=0;i<size;i++) 
+        if(points[i].first.x()>=box_max[0]-cpy_range && points[i].first.x()<box_max[0]){
+            points.push_back(std::make_pair(Point_3(points[i].first.x()-box_size[0],points[i].first.y(),points[i].first.z()), point_count++));
+        }
+    size=points.size();
+    for(i=0;i<size;i++) 
+        if(points[i].first.y()<box_min[1]+cpy_range){
+            points.push_back(std::make_pair(Point_3(points[i].first.x(),points[i].first.y()+box_size[1],points[i].first.z()), point_count++));
+        }
+    size=points.size();
+    for(i=0;i<size;i++) 
+        if(points[i].first.y()>=box_max[1]-cpy_range && points[i].first.y()<box_max[1]){
+            points.push_back(std::make_pair(Point_3(points[i].first.x(),points[i].first.y()-box_size[1],points[i].first.z()), point_count++));
+        }
+    size=points.size();
+    for(i=0;i<size;i++) 
+        if(points[i].first.z()<box_min[2]+cpy_range){
+            points.push_back(std::make_pair(Point_3(points[i].first.x(),points[i].first.y(),points[i].first.z()+box_size[2]), point_count++));
+        }
+    size=points.size();
+    for(i=0;i<size;i++) 
+        if(points[i].first.z()>=box_max[2]-cpy_range && points[i].first.z()<box_max[2]){
+            points.push_back(std::make_pair(Point_3(points[i].first.x(),points[i].first.y(),points[i].first.z()-box_size[2]), point_count++));
+        }
+    size=points.size();
+
+    
+    std::cout<<"==> Number of points: "<<points.size()<<std::endl;
+    std::cout<<"==> Building Delaunay Triangulation."<<std::endl;
+    
+    DelaunayInfo tess(points.begin(), points.end());
+    assert(tess.is_valid());
+    points.clear();
+    
+    Point_3 simplex_vertices[4];
+    Sphere_3 buffer_sphere;
+    Point_3 buffer_point;
+    Tetrahedron_3 buffer_tetrahedron;
+
+    std::cout<<"==> Number of vertices: "<<tess.number_of_vertices()<<std::endl;
+    std::cout<<"==> Number of all cells: "<<tess.number_of_cells()<<std::endl;
+    std::cout<<"==> Number of finite cells: "<<tess.number_of_finite_cells()<<std::endl;
+    output.n_simplices = tess.number_of_finite_cells();
+    
+    output.x.reserve(tess.number_of_finite_cells());
+    output.y.reserve(tess.number_of_finite_cells());
+    output.z.reserve(tess.number_of_finite_cells());
+    output.r.reserve(tess.number_of_finite_cells());
+    output.volume.reserve(tess.number_of_finite_cells());
+    output.area.reserve(tess.number_of_finite_cells());
+    output.dtfe.reserve(tess.number_of_vertices());
+  
+    std::size_t k = 0;
+    for(i=0; i<tess.number_of_vertices();i++){
+        output.dtfe[i] = 0;
+    }
+    
+    
+    
+    for(finite_cells_info cell=tess.finite_cells_begin();cell!=tess.finite_cells_end();cell++) {
+        
+        
+        buffer_tetrahedron = Tetrahedron_3(cell->vertex(0)->point(),
+                                            cell->vertex(1)->point(),
+                                            cell->vertex(2)->point(),
+                                            cell->vertex(3)->point());
+        output.volume[k] = CGAL::to_double(buffer_tetrahedron.volume());
+        buffer_point = CGAL::circumcenter(buffer_tetrahedron);
+        output.x[k] = CGAL::to_double(buffer_point.x());
+        output.y[k] = CGAL::to_double(buffer_point.y());
+        output.z[k] = CGAL::to_double(buffer_point.z());
+        output.r[k] = CGAL::sqrt(CGAL::to_double(CGAL::squared_distance(buffer_point, cell->vertex(0)->point())));
+        for(i=0;i<4;i++){
+            output.dtfe[cell->vertex(i)->info()] += output.volume[k];
+            output.vertices[i].push_back(cell->vertex(i)->info());
+        }
+        output.area[k] = tetrahedron_area(buffer_tetrahedron);
+        
+        k++;
+    }
+    
+
+
+    return output;
+
+}
 
 
 

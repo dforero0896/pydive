@@ -41,18 +41,18 @@ def pickle_loader(filename):
 
 # make sure to add CGAL to LD_LIBRARY_PATH
 if __name__ == '__main__':
-    N = int(0.5e5)
+    N = int(1e5)
     np.random.seed(42)
     points_raw = np.random.random((N,4)) * BOX_SIZE
     buffer_ones = np.ones_like(points_raw[:,0])
     s = time.time()
-    periodic=False
+    periodic=True
     
 
 
     s = time.time()
     voids, dtfe = get_void_catalog_full(points_raw, 
-                                periodic=False, 
+                                periodic=periodic, 
                                 )
     print(f"CGAL took {time.time() - s} s")
 

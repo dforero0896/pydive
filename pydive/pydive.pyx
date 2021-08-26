@@ -117,6 +117,7 @@ cdef extern from "delaunay_backend.cpp":
     DelaunayOutput cdelaunay_periodic_extend(vector[double] X, vector[double] Y, vector[double] Z) nogil
     DelaunayOutput cdelaunay_periodic(vector[double] X, vector[double] Y, vector[double] Z) nogil
     DelaunayOutput cdelaunay_full(vector[double] X, vector[double] Y, vector[double] Z) nogil
+    DelaunayOutput cdelaunay_periodic_full(vector[double] X, vector[double] Y, vector[double] Z) nogil
     
 def get_void_catalog_cgal(double[:,:] points,
                         bint periodic = False,
@@ -189,7 +190,7 @@ def get_void_catalog_full(double[:,:] points,
     if not periodic:
         voids = cdelaunay_full(in_x, in_y, in_z)
     else:
-        voids = cdelaunay_periodic_extend(in_x, in_y, in_z)
+        voids = cdelaunay_periodic_full(in_x, in_y, in_z)
         
     cdef size_t n_simplices
     in_x.clear()
@@ -219,7 +220,8 @@ def get_void_catalog_full(double[:,:] points,
         w = 1. / voids.r[k]
         numerator = 0
         for i in range(4):
-            numerator += w * dtfe[<size_t> voids.vertices[i][k]]
+            if voids.vertices[i][k] < points.shape[0]:
+                numerator += w * dtfe[<size_t> voids.vertices[i][k]]
         output[k,5] = numerator / (4 * w)
         output[k,6] = voids.area[k]
         
