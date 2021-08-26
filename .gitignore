@@ -15,4 +15,7 @@ tests/CAT*
 *.conf
 *.dat
 *.npy
+<<<<<<< HEAD
 !dtfe.png
+=======
+>>>>>>> master
