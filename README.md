@@ -17,7 +17,46 @@ I have also added routines for sky to cartesian coordinate conversion (which use
 
 Given that CGAL is used in this code, the GMP, MPFR, BOOST and (of course) CGAL libraries are necessary. Given that the code is called from Python, the CGAL library must be built beforehand see the compilation/installation guide for CGAL [here](https://doc.cgal.org/latest/Manual/installation.html). GSL is used for the coordinate conversion routines. When compilig `pydive` make sure to edit `setup.py` to your `lib` and `include` dirs for all libraries needed and add the flags `-gsl -gslcblas -CGAL -gmp -mpfr`
 
-For information about the motivation, references and original implementation, please visit [DIVE's repository](https://github.com/cheng-zhao/DIVE). If you use this implementation in a scientific publication, please link to this repository and cite the DIVE paper.
+For information about the motivation, references and original implementation, please visit [DIVE's repository](https://github.com/cheng-zhao/DIVE). 
+
+If you use this implementation in a scientific publication, please link to this repository and cite the following papers
+```
+@ARTICLE{2021arXiv210702950F,
+       author = {{Forero-S{\'a}nchez}, Daniel and {Zhao}, Cheng and {Tao}, Charling and {Chuang}, Chia-Hsun and {Kitaura}, Francisco-Shu and {Variu}, Andrei and {Tamone}, Am{\'e}lie and {Kneib}, Jean-Paul},
+        title = "{Cosmic Void Baryon Acoustic Oscillation Measurement: Evaluation of Sensitivity to Selection Effects}",
+      journal = {arXiv e-prints},
+     keywords = {Astrophysics - Cosmology and Nongalactic Astrophysics},
+         year = 2021,
+        month = jul,
+          eid = {arXiv:2107.02950},
+        pages = {arXiv:2107.02950},
+archivePrefix = {arXiv},
+       eprint = {2107.02950},
+ primaryClass = {astro-ph.CO},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2021arXiv210702950F},
+      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}
+```
+```
+@ARTICLE{2016MNRAS.459.2670Z,
+       author = {{Zhao}, Cheng and {Tao}, Charling and {Liang}, Yu and {Kitaura}, Francisco-Shu and {Chuang}, Chia-Hsun},
+        title = "{DIVE in the cosmic web: voids with Delaunay triangulation from discrete matter tracer distributions}",
+      journal = {\mnras},
+     keywords = {methods: data analysis, catalogues, galaxies: structure, large-scale structure of Universe, Astrophysics - Cosmology and Nongalactic Astrophysics},
+         year = 2016,
+        month = jul,
+       volume = {459},
+       number = {3},
+        pages = {2670-2680},
+          doi = {10.1093/mnras/stw660},
+archivePrefix = {arXiv},
+       eprint = {1511.04299},
+ primaryClass = {astro-ph.CO},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2016MNRAS.459.2670Z},
+      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}
+
+```
 
 ### Usage examples
 
