@@ -1,1 +1,2 @@
-from . import pydive
+
+from pydive import *

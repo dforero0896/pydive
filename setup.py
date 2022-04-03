@@ -2,11 +2,9 @@ from setuptools import setup, Extension, find_packages
 from Cython.Build import cythonize
 import numpy
 import os
-os.environ["CC"]="/home/astro/zhaoc/local/bin/gcc"
-os.environ["CXX"]="/home/astro/zhaoc/local/bin/g++"
 print(os.environ['LD_LIBRARY_PATH'])
 print(os.environ['PATH'])
-
+os.system("bash run_cmake.sh")
 
 extra_compile_args=['-fPIC']
 extra_link_args=[]
@@ -21,17 +19,15 @@ myext = Extension("pydive.pydive",
                             #'pydive/delaunay_backend.cpp'
                             ],
                   include_dirs=[numpy.get_include(), 
-                                '/home/astro/dforero/lib/CGAL-5.2.2/include', 
-                                '/home/astro/zhaoc/local/lib/gcc/x86_64-pc-linux-gnu/10.3.0/include',
-                                '/home/astro/zhaoc/local/lib/gcc/x86_64-pc-linux-gnu/10.3.0/include-fixed'
+                                '/global/u1/d/dforero/lib/CGAL-5.4/include', 
+				'/global/common/software/nersc/cori-2022q1/spack/cray-cnl7-haswell/gsl-2.7-ihnf7gi/include'
                                 ],
                                 
                   library_dirs=[
                                 '/home/astro/dforero/lib/CGAL-5.2.2/build/lib',
-                                '/home/astro/zhaoc/local/lib',
-                                '/home/astro/zhaoc/local/lib64'
+				"/global/common/software/nersc/cori-2022q1/spack/cray-cnl7-haswell/gsl-2.7-ihnf7gi/lib"
                                 ],
-                  libraries=['m', 'gsl', 'gslcblas', 'CGAL', 'gmp', 'mpfr'],
+                  libraries=['m', 'gsl', 'gslcblas', 'gmp', 'mpfr'],
                   language='c++',
                   extra_compile_args=extra_compile_args,
                   extra_link_args=extra_link_args

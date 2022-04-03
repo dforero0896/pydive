@@ -15,7 +15,8 @@ I have also added routines for sky to cartesian coordinate conversion (which use
 
 ## Compilation notes
 
-Given that CGAL is used in this code, the GMP, MPFR, BOOST and (of course) CGAL libraries are necessary. Given that the code is called from Python, the CGAL library must be built beforehand see the compilation/installation guide for CGAL [here](https://doc.cgal.org/latest/Manual/installation.html). GSL is used for the coordinate conversion routines. When compilig `pydive` make sure to edit `setup.py` to your `lib` and `include` dirs for all libraries needed and add the flags `-gsl -gslcblas -CGAL -gmp -mpfr`
+Some parts of the code need GSL so make sure to link to it. If GSL is installed in your system wou may use `gsl-config` to find out the paths to the libraries and headers. CGAL requires the codes using it to use `cmake` too. The script `run_cmake.sh` handles the cmake part of the build, you should only make sure that the path to the  `cgal_create_CMakeLists` is properly set, it should be in your CGAL installation directory, i.e. `PATH/TO/CGAL/CGAL-5.4/bin/cgal_create_CMakeLists`. Once you have set the path, you can then make sure that the `include` and `library` paths in `setup.py` are correctly set. Once this is done, the code can be built with the `make` command. You may find more informtion on building software with CGAL [here](https://doc.cgal.org/latest/Manual/installation.html). To use the code you must add the directory `pydive` to your python path usign e.g. `export PYTHONPATH=/path/to/pydive/pydive:$PYTHONPATH` or using `sys.path.append()`.
+
 
 For information about the motivation, references and original implementation, please visit [DIVE's repository](https://github.com/cheng-zhao/DIVE). 
 

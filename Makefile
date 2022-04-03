@@ -1,4 +1,3 @@
-CXX=/home/astro/zhaoc/local/bin/g++
 #export CC=/home/astro/zhaoc/local/bin/gcc
 #export LD_LIBRARY_PATH=/home/astro/dforero/lib/CGAL-5.2.2/build/lib:/home/astro/zhaoc/local/lib:/home/astro/zhaoc/local/lib64:$LD_LIBRARY_PATH
 #export PATH=/home/astro/zhaoc/local/bin:$PATH
@@ -9,7 +8,7 @@ LIB_DIRS=-L/home/astro/dforero/lib/CGAL-5.2.2/build/lib #-L/home/astro/zhaoc/loc
 all: 
 	python setup.py build_ext --inplace
 delaunay:
-	$(CXX) pydive/delaunay_backend.cpp $(INCLUDE_DIRS)  $(LIB_DIRS) -lCGAL -lgmp -lmpfr -frounding-math -o delaunay_backend.o 
+	$(CXX) pydive/delaunay_backend.cpp $(INCLUDE_DIRS)  $(LIB_DIRS)  -lgmp -lmpfr -frounding-math -o delaunay_backend.o 
 clean:
-	rm -f pydive/*so pydive/pydive.cpp delaunay_backend.o
+	rm -f pydive/*so pydive/pydive.cpp delaunay_backend.o pydive/delaunay_backend
 	
