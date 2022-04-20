@@ -62,12 +62,23 @@ cdef extern from "gsl/gsl_vector.h":
         int owner
     gsl_vector *gsl_vector_alloc (const size_t n) nogil
     void gsl_vector_set (gsl_vector * v, const size_t i, double x) nogil
+    double gsl_vector_get(gsl_vector * v, size_t i) nogil
     void gsl_vector_free (gsl_vector * v) nogil
 cdef extern from "gsl/gsl_blas.h":
     int gsl_blas_ddot (const gsl_vector * X,
                    const gsl_vector * Y,
                    double * result
                    ) nogil
+    int gsl_blas_dgemv(CBLAS_TRANSPOSE_t TransA,
+                        double alpha,
+                        gsl_matrix * A, 
+                        gsl_vector * x, 
+                        double beta, 
+                        gsl_vector * y) nogil
+    ctypedef enum CBLAS_TRANSPOSE_t:
+                    CblasNoTrans=111
+                    CblasTrans=112
+                    CblasConjTrans=113
 cdef extern from "gsl/gsl_math.h":
     ctypedef struct gsl_function:
         double (* function) (double x, void * params) 
@@ -106,11 +117,13 @@ cdef extern from "gsl/gsl_integration.h":
 cdef extern from "gsl/gsl_linalg.h":
     int gsl_linalg_LU_decomp (gsl_matrix * A, gsl_permutation * p, int *signum) nogil
     double gsl_linalg_LU_det (gsl_matrix * LU, int signum) nogil
+    int  gsl_linalg_LU_invert(gsl_matrix * LU, gsl_permutation * p, gsl_matrix * inverse) nogil
+
 
 
 cdef extern from "delaunay_backend.cpp":
     cdef cppclass DelaunayOutput:
-        vector[double] x, y, z, r, volume, dtfe, area
+        vector[double] x, y, z, r, volume, dtfe, area, px, py, pz
         vector[size_t] vertices[4]
         size_t n_simplices
     DelaunayOutput cdelaunay(vector[double] X, vector[double] Y, vector[double] Z) nogil
@@ -118,6 +131,22 @@ cdef extern from "delaunay_backend.cpp":
     DelaunayOutput cdelaunay_periodic(vector[double] X, vector[double] Y, vector[double] Z) nogil
     DelaunayOutput cdelaunay_full(vector[double] X, vector[double] Y, vector[double] Z) nogil
     DelaunayOutput cdelaunay_periodic_full(vector[double] X, vector[double] Y, vector[double] Z) nogil
+
+cdef void matrix_invert(gsl_matrix *matrix, gsl_matrix *matrix_inv, int size) nogil:
+
+    cdef gsl_permutation *p = gsl_permutation_alloc(size);
+    cdef int s;
+
+    
+    gsl_linalg_LU_decomp(matrix, p, &s);
+
+    
+    
+    gsl_linalg_LU_invert(matrix, p, matrix_inv);
+
+    gsl_permutation_free(p);
+
+
     
 def get_void_catalog_cgal(double[:,:] points,
                         bint periodic = False,
@@ -172,13 +201,11 @@ def get_void_catalog_cgal(double[:,:] points,
 def get_void_catalog_full(double[:,:] points,
                         bint periodic=False,
                         int n_threads = 16,
-                        ):
+                        double p = 2):
 
-    cdef Py_ssize_t i,k
+    cdef Py_ssize_t i,k,j
     cdef vector[double] in_x, in_y, in_z
-    
-    
-    
+       
     in_x.reserve(points.shape[0])
     in_y.reserve(points.shape[0])
     in_z.reserve(points.shape[0])
@@ -199,7 +226,7 @@ def get_void_catalog_full(double[:,:] points,
     in_y.clear()
     in_z.clear()
     
-    cdef double p, w, numerator
+    cdef double w, numerator
     
 
 
@@ -212,11 +239,57 @@ def get_void_catalog_full(double[:,:] points,
     printf("==> Computing DTFE\n")
     fflush(stdout)
     for k in range(points.shape[0]):
-        dtfe[k] = 4. / voids.dtfe[k]
+        
+        dtfe_view[k] = 4. / voids.dtfe[k]
+        
+        
+        
     printf("==> Copying voids and interpolating\n")
     fflush(stdout)
-    p = 2
+    
     #for k in prange(n_simplices, nogil=True, num_threads=n_threads):
+    """
+    # Compute gradients
+    gradients = np.zeros((n_simplices, 3), dtype=np.double)
+    cdef double [:,:] gradients_view = gradients
+    cdef gsl_matrix * A = gsl_matrix_alloc(3, 3)
+    cdef gsl_matrix * Ainv = gsl_matrix_alloc(3, 3)
+    cdef gsl_vector * rho = gsl_vector_alloc(3)
+    cdef gsl_vector * grad = gsl_vector_alloc(3)
+    cdef size_t ind_a, ind_b
+    
+    for k in range(n_simplices):
+        ind_b = <size_t>voids.vertices[0][k]
+        printf("%ld, %ld\n", ind_a, ind_b)
+        fflush(stdout)
+        if voids.r[k] > 50: continue
+        for j in range(3):
+            ind_a = <size_t>voids.vertices[j+1][k]
+            gsl_matrix_set(A, 0, j, in_x[ind_a] - in_x[ind_b])
+            gsl_matrix_set(A, 1, j, in_y[ind_a] - in_y[ind_b])
+            gsl_matrix_set(A, 2, j, in_z[ind_a] - in_z[ind_b])
+            gsl_vector_set(rho, j, voids.dtfe[ind_a] - voids.dtfe[ind_b])
+            printf("%lf %lf %lf\n", in_x[ind_a] - in_x[ind_b], in_y[ind_a] - in_y[ind_b], in_z[ind_a] - in_z[ind_b])
+            fflush(stdout)
+        matrix_invert(A, Ainv, 3)
+        gsl_blas_dgemv(CblasNoTrans,
+                        1.,
+                        Ainv, 
+                        rho, 
+                        0., 
+                        grad)
+        gradients_view[k, 0] = gsl_vector_get(grad,0)
+        gradients_view[k, 1] = gsl_vector_get(grad,1)
+        gradients_view[k, 2] = gsl_vector_get(grad,2)
+        
+        
+    gsl_matrix_free(A)
+    gsl_matrix_free(Ainv)
+    gsl_vector_free(rho)
+    gsl_vector_free(grad)
+    """    
+    
+    
     for k in range(n_simplices):
         output_view[k,0] = voids.x[k]
         output_view[k,1] = voids.y[k]
@@ -229,9 +302,10 @@ def get_void_catalog_full(double[:,:] points,
             if voids.vertices[i][k] < points.shape[0]:
                 numerator = numerator + w * dtfe_view[<size_t> voids.vertices[i][k]]
         output_view[k,5] = numerator / (4 * w)
+        
         output_view[k,6] = voids.area[k]
         
-
+    
 
     printf("    Done\n")
     fflush(stdout)
@@ -260,7 +334,7 @@ cpdef int allocate_to_grid(double[:,:] data,
         idy = <int> ((data[i, 1] * inv_bin_size) + n_grid) % n_grid
         idz = <int> ((data[i, 2] * inv_bin_size) + n_grid) % n_grid
         
-        if n_buffer > grid_void_count[idx, idy, idz]: return -1
+        if n_buffer < grid_void_count[idx, idy, idz]: return -1
         grid_id_buffer[idx, idy, idz, grid_void_count[idx, idy, idz]] = i
         grid_void_count[idx, idy, idz] += 1
     

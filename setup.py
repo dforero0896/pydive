@@ -20,12 +20,14 @@ myext = Extension("pydive.pydive",
                             ],
                   include_dirs=[numpy.get_include(), 
                                 '/global/u1/d/dforero/lib/CGAL-5.4/include', 
-				'/global/common/software/nersc/cori-2022q1/spack/cray-cnl7-haswell/gsl-2.7-ihnf7gi/include'
+				'/global/common/software/nersc/cori-2022q1/spack/cray-cnl7-haswell/gsl-2.7-ihnf7gi/include',
+				"/global/homes/d/dforero/.conda/envs/jax/include"
                                 ],
                                 
                   library_dirs=[
                                 '/home/astro/dforero/lib/CGAL-5.2.2/build/lib',
-				"/global/common/software/nersc/cori-2022q1/spack/cray-cnl7-haswell/gsl-2.7-ihnf7gi/lib"
+				"/global/common/software/nersc/cori-2022q1/spack/cray-cnl7-haswell/gsl-2.7-ihnf7gi/lib",
+				"/global/homes/d/dforero/.conda/envs/jax/lib"
                                 ],
                   libraries=['m', 'gsl', 'gslcblas', 'gmp', 'mpfr'],
                   language='c++',

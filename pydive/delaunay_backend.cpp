@@ -4,11 +4,13 @@
 #include <CGAL/Periodic_3_Delaunay_triangulation_traits_3.h>
 #include <CGAL/Periodic_3_Delaunay_triangulation_3.h>
 #include <CGAL/Delaunay_triangulation_3.h>
+#include <CGAL/natural_neighbor_coordinates_3.h>
 
 #include <CGAL/Triangulation_vertex_base_with_info_3.h>
 #include <CGAL/Sphere_3.h>
 #include <CGAL/Tetrahedron_3.h>
 #include <CGAL/Triangle_3.h>
+
 
 #include <vector>
 #include <set>
@@ -266,6 +268,8 @@ DelaunayOutput cdelaunay_periodic_extend(std::vector<double> X, std::vector<doub
         output.y[k] = CGAL::to_double(buffer_point.y());
         output.z[k] = CGAL::to_double(buffer_point.z());
         output.r[k] = CGAL::sqrt(CGAL::to_double(CGAL::squared_distance(buffer_point, cell->vertex(0)->point())));
+        
+        
 
         k++;
 

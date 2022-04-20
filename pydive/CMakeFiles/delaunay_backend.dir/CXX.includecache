@@ -24805,6 +24805,8 @@ CGAL/Periodic_3_Delaunay_triangulation_3.h
 -
 CGAL/Delaunay_triangulation_3.h
 -
+CGAL/natural_neighbor_coordinates_3.h
+-
 CGAL/Triangulation_vertex_base_with_info_3.h
 -
 CGAL/Sphere_3.h
@@ -31614,6 +31616,12 @@ CGAL/LEDA_arithmetic_kernel.h
 
 /global/u1/d/dforero/lib/CGAL-5.4/include/CGAL/license.h
 
+/global/u1/d/dforero/lib/CGAL-5.4/include/CGAL/license/Interpolation.h
+CGAL/config.h
+-
+CGAL/license.h
+-
+
 /global/u1/d/dforero/lib/CGAL-5.4/include/CGAL/license/Mesh_3.h
 CGAL/config.h
 -
@@ -31746,6 +31754,32 @@ CGAL/Residue.h
 CGAL/Modular_traits.h
 -
 CGAL/Quotient.h
+-
+
+/global/u1/d/dforero/lib/CGAL-5.4/include/CGAL/natural_neighbor_coordinates_3.h
+CGAL/license/Interpolation.h
+-
+CGAL/tags.h
+-
+CGAL/iterator.h
+-
+CGAL/utility.h
+-
+CGAL/triangulation_assertions.h
+-
+CGAL/number_utils.h
+-
+algorithm
+-
+iostream
+-
+map
+-
+set
+-
+utility
+-
+vector
 -
 
 /global/u1/d/dforero/lib/CGAL-5.4/include/CGAL/number_type_basic.h
