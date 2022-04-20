@@ -344,11 +344,12 @@ def get_satellites(double[:,:] data,
                     int[:,:,:] grid_void_count, 
                     int[:,:,:,:] grid_id_buffer, 
                     int[:] central_id, 
-                    bint[:] is_central, 
+                    int[:] is_central, 
                     int[:] n_satellites, 
                     double[:] distances, 
                     double[:] central_radius, 
-                    double box_size):
+                    double box_size,
+                    double box_pad):
 
     """
     Compute the number of satellites from a void catalog
@@ -376,9 +377,10 @@ def get_satellites(double[:,:] data,
         Size of the box in which the grid is embedded
     
     """
-
+    if data.shape[1] < 4:
+        raise ValueError
     cdef int n_grid = grid_void_count.shape[0]
-    cdef double inv_bin_size = n_grid / box_size
+    cdef double inv_bin_size = n_grid / (box_size + 2 * box_pad)
     cdef int xmin, xmax, ymin, ymax, zmin, zmax
     cdef Py_ssize_t i, j, k
     cdef double sqr, r
@@ -390,26 +392,30 @@ def get_satellites(double[:,:] data,
             central_id[i] = i
             central_radius[i] = data[i,3]
             r = data[i,3] 
-            xmin = <int> (((data[i,0] - r) * inv_bin_size) )
-            xmax = <int> (((data[i,0] + r) * inv_bin_size) )
-            ymin = <int> (((data[i,1] - r) * inv_bin_size) )
-            ymax = <int> (((data[i,1] + r) * inv_bin_size) )
-            zmin = <int> (((data[i,2] - r) * inv_bin_size) )
-            zmax = <int> (((data[i,2] + r) * inv_bin_size) )
+            xmin = <int> (((data[i,0] + box_pad - r) * inv_bin_size) )
+            xmax = <int> (((data[i,0] + box_pad + r) * inv_bin_size) )
+            ymin = <int> (((data[i,1] + box_pad - r) * inv_bin_size) )
+            ymax = <int> (((data[i,1] + box_pad + r) * inv_bin_size) )
+            zmin = <int> (((data[i,2] + box_pad - r) * inv_bin_size) )
+            zmax = <int> (((data[i,2] + box_pad + r) * inv_bin_size) )
             
             for xid in range(xmin, xmax+1):
-                if xid >= n_grid: continue
+                #if xid >= n_grid: continue
+                xid += n_grid
+                xid %= n_grid
                 for yid in range(ymin, ymax+1):
-                    if yid >= n_grid: continue
+                    #if yid >= n_grid: continue
+                    yid += n_grid
+                    yid %= n_grid
                     for zid in range(zmin, zmax+1):
-                        if zid >= n_grid: continue
-                        
+                        #if zid >= n_grid: continue
+                        zid += n_grid
+                        zid %= n_grid
+
                         for j in range(grid_void_count[xid, yid, zid]):
                             k = grid_id_buffer[xid, yid, zid, j]
                             
-                            
                             if k <= i: continue
-                            
                             distance = (data[i, 0] - data[k, 0])**2 + (data[i, 1] - data[k, 1])**2 + (data[i, 2] - data[k, 2])**2
                             
                             if distance < sqr:
@@ -417,14 +423,14 @@ def get_satellites(double[:,:] data,
                                 if is_central[k]:    
                                     central_id[k] = i
                                     central_radius[k] = data[i,3]
-                                    is_central[k] = False
+                                    is_central[k] = 0
                                     n_satellites[i] += 1
                                     distances[k] = distance
                                 elif not is_central[k] and distances[k] < distance:
                                     n_satellites[central_id[k]] -= 1
                                     central_id[k] = i
                                     central_radius[k] = data[i,3]
-                                    is_central[k] = False
+                                    is_central[k] = 0
                                     n_satellites[i] += 1
                                     distances[k] = distance
 
