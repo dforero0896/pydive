@@ -10,7 +10,14 @@ The Scipy backend has been deprecated in the latest version in favor of the fast
 To replicate the functionality of `DIVE`, one must use the function `get_void_catalog_cgal`.
 Running `pydive` on periodic boxes can now be done in two ways: With `periodic_mode=0` the boundaries of the box are extended by a distance of 5 * `(n_objects/box_volume)**(-1./3)`. This setting is much faster but uses up more memory due to the copying of points. With `periodic_mode=1` the periodic triangulation data structures in CGAL are used. For some reason this results in ~5x slower run time.
 
-In addition, one may compute other features of the triangulation. For now, you may compute simplex area, volume, DTFE density estimation (at points and void positions). In a future a feature selection could be added to improve performance. To do this on periodic boxes, only duplicating boundaries is available given that CGAL vertex info is used and that is not available for periodic triangulation vertices for now. These features are available with the `get_void_catalog_full` function. See below for use examples.
+In addition, one may compute other features of the triangulation. For now, you may compute simplex area, volume, DTFE density estimation (at points and void positions). In a future a feature selection could be added to improve performance. To do this on periodic boxes, only duplicating boundaries is available given that `CGAL vertex info` is used and that is not available for periodic triangulation vertices for now. These features are available with the `get_void_catalog_full` function. See below for use examples. The output columns for the **void catalog** are 
+
+|x|y|z|circumsphere radius|simplex volume|IDW DTFE estimate|simplex surface area|
+|-|-|-|-|-|-|-|
+
+The DTFE estimates of the point density are also returned.
+
+
 I have also added routines for sky to cartesian coordinate conversion (which use GSL).
 
 ## Compilation notes
