@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/astro/dforero/.conda/envs/main/x86_64-conda-linux-gnu/sysroot/usr/include/math.h
+features.h
+-
+bits/huge_val.h
+-
+bits/huge_valf.h
+-
+bits/huge_vall.h
+-
+bits/inf.h
+-
+bits/nan.h
+-
+bits/mathdef.h
+-
+bits/mathcalls.h
+-
+bits/mathcalls.h
+-
+bits/mathcalls.h
+-
+bits/mathinline.h
+-
+

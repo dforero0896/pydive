@@ -23,102 +23,6 @@ cdef extern from "math.h":
     double sin(double x) nogil
     double pow(double x, double y) nogil
 ctypedef int size_t
-cdef extern from "gsl/gsl_block.h":
-    ctypedef struct gsl_block:
-        size_t size
-        double * data
-cdef extern from "gsl/gsl_permutation.h":
-    ctypedef struct gsl_permutation:
-        size_t size
-        size_t * data
-    gsl_permutation *  gsl_permutation_alloc(size_t n) nogil
-    void gsl_permutation_free(gsl_permutation * p) nogil
-cdef extern from "gsl/gsl_matrix.h":
-    ctypedef struct gsl_matrix:
-        size_t size1
-        size_t size2
-        size_t tda
-        double * data
-        gsl_block * block
-        int owner
-    ctypedef struct gsl_matrix_view:
-        gsl_matrix matrix
-    gsl_matrix_view_array (double * base,
-                             const size_t n1, 
-                             const size_t n2) nogil
-    gsl_matrix *  gsl_matrix_alloc(size_t n1, size_t n2) nogil
-    double  gsl_matrix_get(gsl_matrix * m, size_t i, size_t j) nogil
-    void  gsl_matrix_set(gsl_matrix * m, size_t i, size_t j, double x) nogil
-    void  gsl_matrix_free(gsl_matrix * m) nogil
-    gsl_matrix_view  gsl_matrix_submatrix(gsl_matrix * m, size_t k1, size_t k2, size_t n1, size_t n2) nogil
-    int  gsl_matrix_memcpy(gsl_matrix * dest, gsl_matrix * src) nogil
-
-cdef extern from "gsl/gsl_vector.h":
-    ctypedef struct gsl_vector:
-        size_t size
-        size_t stride
-        double * data
-        gsl_block * block
-        int owner
-    gsl_vector *gsl_vector_alloc (const size_t n) nogil
-    void gsl_vector_set (gsl_vector * v, const size_t i, double x) nogil
-    double gsl_vector_get(gsl_vector * v, size_t i) nogil
-    void gsl_vector_free (gsl_vector * v) nogil
-cdef extern from "gsl/gsl_blas.h":
-    int gsl_blas_ddot (const gsl_vector * X,
-                   const gsl_vector * Y,
-                   double * result
-                   ) nogil
-    int gsl_blas_dgemv(CBLAS_TRANSPOSE_t TransA,
-                        double alpha,
-                        gsl_matrix * A, 
-                        gsl_vector * x, 
-                        double beta, 
-                        gsl_vector * y) nogil
-    ctypedef enum CBLAS_TRANSPOSE_t:
-                    CblasNoTrans=111
-                    CblasTrans=112
-                    CblasConjTrans=113
-cdef extern from "gsl/gsl_math.h":
-    ctypedef struct gsl_function:
-        double (* function) (double x, void * params) 
-        void * params
-cdef extern from "gsl/gsl_linalg.h":
-    int gsl_linalg_LU_decomp (gsl_matrix * A, gsl_permutation * p, int *signum) nogil
-    int gsl_linalg_LU_solve (const gsl_matrix * LU,
-                         const gsl_permutation * p,
-                         const gsl_vector * b,
-                         gsl_vector * x) nogil
-cdef extern from "gsl/gsl_integration.h":
-    ctypedef struct gsl_integration_workspace:
-        size_t limit
-        size_t nrmax
-        size_t i
-        size_t maximum_level
-        double *alist
-        double *blist
-        double *rlist
-        double *elist
-        size_t *order
-        size_t *level
-    gsl_integration_workspace * gsl_integration_workspace_alloc(const size_t n) nogil
-    void gsl_integration_workspace_free(gsl_integration_workspace * w) nogil
-    int gsl_integration_qag (const gsl_function *f, 
-                         double a, double b,
-                         double epsabs, double epsrel, size_t limit,
-                         int key,
-                         gsl_integration_workspace * workspace,
-                         double *result, double *abserr) nogil
-    DEF GSL_INTEG_GAUSS51 = 5
-    DEF GSL_INTEG_GAUSS61 = 6
-
-
-
-cdef extern from "gsl/gsl_linalg.h":
-    int gsl_linalg_LU_decomp (gsl_matrix * A, gsl_permutation * p, int *signum) nogil
-    double gsl_linalg_LU_det (gsl_matrix * LU, int signum) nogil
-    int  gsl_linalg_LU_invert(gsl_matrix * LU, gsl_permutation * p, gsl_matrix * inverse) nogil
-
 
 
 cdef extern from "delaunay_backend.cpp":
@@ -131,20 +35,8 @@ cdef extern from "delaunay_backend.cpp":
     DelaunayOutput cdelaunay_periodic(vector[double] X, vector[double] Y, vector[double] Z) nogil
     DelaunayOutput cdelaunay_full(vector[double] X, vector[double] Y, vector[double] Z) nogil
     DelaunayOutput cdelaunay_periodic_full(vector[double] X, vector[double] Y, vector[double] Z) nogil
+    DelaunayOutput cdelaunay_periodic_full_parallel(vector[double] X, vector[double] Y, vector[double] Z) nogil
 
-cdef void matrix_invert(gsl_matrix *matrix, gsl_matrix *matrix_inv, int size) nogil:
-
-    cdef gsl_permutation *p = gsl_permutation_alloc(size);
-    cdef int s;
-
-    
-    gsl_linalg_LU_decomp(matrix, p, &s);
-
-    
-    
-    gsl_linalg_LU_invert(matrix, p, matrix_inv);
-
-    gsl_permutation_free(p);
 
 
     
@@ -201,7 +93,8 @@ def get_void_catalog_cgal(double[:,:] points,
 def get_void_catalog_full(double[:,:] points,
                         bint periodic=False,
                         int n_threads = 16,
-                        double p = 2):
+                        double p = 2,
+                        bint parallel = False):
 
     cdef Py_ssize_t i,k,j
     cdef vector[double] in_x, in_y, in_z
@@ -219,7 +112,10 @@ def get_void_catalog_full(double[:,:] points,
     if not periodic:
         voids = cdelaunay_full(in_x, in_y, in_z)
     else:
-        voids = cdelaunay_periodic_full(in_x, in_y, in_z)
+        if not parallel:
+            voids = cdelaunay_periodic_full(in_x, in_y, in_z)
+        else:
+            voids = cdelaunay_periodic_full_parallel(in_x, in_y, in_z)
         
     cdef size_t n_simplices
     in_x.clear()
@@ -246,48 +142,6 @@ def get_void_catalog_full(double[:,:] points,
         
     printf("==> Copying voids and interpolating\n")
     fflush(stdout)
-    
-    #for k in prange(n_simplices, nogil=True, num_threads=n_threads):
-    """
-    # Compute gradients
-    gradients = np.zeros((n_simplices, 3), dtype=np.double)
-    cdef double [:,:] gradients_view = gradients
-    cdef gsl_matrix * A = gsl_matrix_alloc(3, 3)
-    cdef gsl_matrix * Ainv = gsl_matrix_alloc(3, 3)
-    cdef gsl_vector * rho = gsl_vector_alloc(3)
-    cdef gsl_vector * grad = gsl_vector_alloc(3)
-    cdef size_t ind_a, ind_b
-    
-    for k in range(n_simplices):
-        ind_b = <size_t>voids.vertices[0][k]
-        printf("%ld, %ld\n", ind_a, ind_b)
-        fflush(stdout)
-        if voids.r[k] > 50: continue
-        for j in range(3):
-            ind_a = <size_t>voids.vertices[j+1][k]
-            gsl_matrix_set(A, 0, j, in_x[ind_a] - in_x[ind_b])
-            gsl_matrix_set(A, 1, j, in_y[ind_a] - in_y[ind_b])
-            gsl_matrix_set(A, 2, j, in_z[ind_a] - in_z[ind_b])
-            gsl_vector_set(rho, j, voids.dtfe[ind_a] - voids.dtfe[ind_b])
-            printf("%lf %lf %lf\n", in_x[ind_a] - in_x[ind_b], in_y[ind_a] - in_y[ind_b], in_z[ind_a] - in_z[ind_b])
-            fflush(stdout)
-        matrix_invert(A, Ainv, 3)
-        gsl_blas_dgemv(CblasNoTrans,
-                        1.,
-                        Ainv, 
-                        rho, 
-                        0., 
-                        grad)
-        gradients_view[k, 0] = gsl_vector_get(grad,0)
-        gradients_view[k, 1] = gsl_vector_get(grad,1)
-        gradients_view[k, 2] = gsl_vector_get(grad,2)
-        
-        
-    gsl_matrix_free(A)
-    gsl_matrix_free(Ainv)
-    gsl_vector_free(rho)
-    gsl_vector_free(grad)
-    """    
     
     
     for k in range(n_simplices):
@@ -435,56 +289,3 @@ def get_satellites(double[:,:] data,
                                     distances[k] = distance
 
 
-########################################## Sky to Cartesian Coordinate conversion ################################################
-
-@cython.boundscheck(False)
-cdef double comoving_dist_integrand(double x, void * params) nogil:
-
-    # Signature must match what GSL asks for in the integration.
-    # Extract parameters
-    cdef double H0 =  (<double *> params)[0]
-    cdef double OmegaL =  (<double *> params)[1]
-    cdef double OmegaM =  (<double *> params)[2]
-    cdef double c =  (<double *> params)[3]
-    #printf("%lf %lf %lf %lf\n", H0, OmegaL, OmegaM, c)
-
-    cdef double H = H0 * sqrt(OmegaL + OmegaM * pow( 1 + x , 3))
-
-    return c / H
-    
-cdef double integrate_z(double z, double H0, double OmegaL, double OmegaM) nogil :
-
-    cdef gsl_integration_workspace *w
-    cdef double result, error
-    cdef double c = SPEED_OF_LIGHT
-    cdef int prec = PREC_DIGIT
-    cdef gsl_function integrand
-    cdef double* params = [ H0, OmegaL, OmegaM, c ]
-
-    integrand.function = &comoving_dist_integrand
-    integrand.params = params
-
-    w = gsl_integration_workspace_alloc(1000)
-    gsl_integration_qag(&integrand, 0, z, 0, pow(10, -prec), 1000, GSL_INTEG_GAUSS51, w, &result, &error)
-    gsl_integration_workspace_free(w)
-
-    return result
-
-@cython.boundscheck(False)
-def sky_to_cart_parallel(double[:,:] input, double[:,:] output, int n_lines, int n_threads, double H0=67.7, double OmegaM=0.307115):
-
-    cdef double OmegaL = 1 - OmegaM
-    cdef double dist, ra, dec, h
-    h = H0 / 100
-    cdef Py_ssize_t i
-    for i in prange(n_lines, nogil=True, num_threads=n_threads):
-        dist = integrate_z(input[i,2], H0, OmegaL, OmegaM)
-        ra = input[i,0] * PI / 180
-        dec = input[i,1] * PI / 180
-        #X
-        output[i,0] = dist * cos(dec) * cos(ra) * h
-        #Y
-        output[i,1] = dist * cos(dec) * sin(ra) * h
-        #Z
-        output[i,2] = dist * sin(dec) * h
-        
