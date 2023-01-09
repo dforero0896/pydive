@@ -3,7 +3,7 @@ import sys
 import time
 #sys.path.append("./pydive")
 sys.path.append("/home/astro/dforero/codes/pydive/pydive")
-from pydive.pydive import get_void_catalog_cgal, get_void_catalog_full
+from pydive import get_void_catalog_cgal, get_void_catalog_full
 from scipy.spatial import Delaunay
 from scipy.interpolate import LinearNDInterpolator, NearestNDInterpolator
 import pandas as pd
@@ -55,6 +55,7 @@ if __name__ == '__main__':
     s = time.time()
     voids, dtfe = get_void_catalog_full(points_raw, 
                                 periodic=periodic, 
+                                parallel = False
                                 )
     print(f"CGAL took {time.time() - s} s", flush=True)
 

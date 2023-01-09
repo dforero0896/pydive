@@ -22,9 +22,14 @@
 #include "omp.h"
 #include <math.h>
 #include <iterator>
+#include <chrono>
+
 
 #define DOUBLE_MAX std::numeric_limits<double>::max();
 #define DOUBLE_MIN std::numeric_limits<double>::min();
+
+using Clock = std::chrono::steady_clock;
+using Second = std::chrono::duration<double, std::ratio<1> >;
 
 // Traits and triangulation data structures
 typedef CGAL::Exact_predicates_exact_constructions_kernel K;
@@ -459,7 +464,7 @@ DelaunayOutput cdelaunay_periodic_full(std::vector<double> X, std::vector<double
     DelaunayOutput output;
     std::vector< std::pair<Point,size_t> >points;
     
-    
+    std::chrono::time_point<Clock> tbeg {Clock::now()};
     
 
     std::size_t i, n_points, j;
@@ -534,9 +539,11 @@ DelaunayOutput cdelaunay_periodic_full(std::vector<double> X, std::vector<double
 
     
     std::cout<<"==> Number of points: "<<points.size()<<std::endl;
+    tbeg = Clock::now();
     std::cout<<"==> Building Delaunay Triangulation."<<std::endl;
     
     DelaunayInfo tess(points.begin(), points.end());
+    std::cout << "Serial timing " << std::chrono::duration_cast<Second>(Clock::now() - tbeg).count() << "s" << std::endl;
     assert(tess.is_valid());
     points.clear();
     
@@ -599,7 +606,7 @@ DelaunayOutput cdelaunay_periodic_full_parallel(std::vector<double> X, std::vect
     DelaunayOutput output;
     std::vector< std::pair<ParPoint,size_t> >points;
     
-    
+    std::chrono::time_point<Clock> tbeg {Clock::now()};
     
 
     std::size_t i, n_points, j;
@@ -674,12 +681,12 @@ DelaunayOutput cdelaunay_periodic_full_parallel(std::vector<double> X, std::vect
 
     
     std::cout<<"==> Number of points: "<<points.size()<<std::endl;
+    tbeg = Clock::now();
     std::cout<<"==> Building Parallel Delaunay Triangulation."<<std::endl;
-    //ParDelaunayInfo::Lock_data_structure locking_ds(
-    //    CGAL::Bbox_3(CGAL::to_double(box_min[0])-cpy_range, CGAL::to_double(box_min[1]) - cpy_range, CGAL::to_double(box_min[2]) - cpy_range, CGAL::to_double(box_max[0]) + cpy_range, CGAL::to_double(box_max[1]) + cpy_range, CGAL::to_double(box_max[2]) + cpy_range), 50);
-    ParDelaunayInfo::Lock_data_structure locking_ds(CGAL::Bbox_3(0., 0., 0., 2000., 2000., 2000.), 100);
-
+    ParDelaunayInfo::Lock_data_structure locking_ds(
+        CGAL::Bbox_3(CGAL::to_double(box_min[0])-cpy_range, CGAL::to_double(box_min[1]) - cpy_range, CGAL::to_double(box_min[2]) - cpy_range, CGAL::to_double(box_max[0]) + cpy_range, CGAL::to_double(box_max[1]) + cpy_range, CGAL::to_double(box_max[2]) + cpy_range), 70);
     ParDelaunayInfo tess(points.begin(), points.end(), &locking_ds);
+    std::cout << "Parallel timing " << std::chrono::duration_cast<Second>(Clock::now() - tbeg).count() << "s" << std::endl;
     assert(tess.is_valid());
     points.clear();
     

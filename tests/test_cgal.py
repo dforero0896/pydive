@@ -1,7 +1,7 @@
 import numpy as np
 import sys, time, os
-sys.path.append("/home/astro/dforero/codes/pydive/pydive")
-from pydive.pydive import get_void_catalog_cgal, get_void_catalog_full
+#sys.path.append("/home/astro/dforero/codes/pydive/")
+from pydive import get_void_catalog_cgal, get_void_catalog_full
 from scipy.spatial import Delaunay
 import matplotlib as mpl
 mpl.use("Agg")
