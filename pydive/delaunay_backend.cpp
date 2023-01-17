@@ -23,6 +23,7 @@
 #include <math.h>
 #include <iterator>
 #include <chrono>
+#include "tbb/parallel_for.h"
 
 
 #define DOUBLE_MAX std::numeric_limits<double>::max();
@@ -34,7 +35,7 @@ using Second = std::chrono::duration<double, std::ratio<1> >;
 // Traits and triangulation data structures
 typedef CGAL::Exact_predicates_exact_constructions_kernel K;
 typedef CGAL::Triangulation_vertex_base_with_info_3<size_t,K> Vertex_base_info;
-typedef CGAL::Triangulation_data_structure_3<Vertex_base_info>  TriangulationDS;
+typedef CGAL::Triangulation_data_structure_3<Vertex_base_info, CGAL::Delaunay_triangulation_cell_base_3<K>>  TriangulationDS;
 typedef CGAL::Periodic_3_Delaunay_triangulation_traits_3<K> P3Traits;
 typedef CGAL::Periodic_3_Delaunay_triangulation_3<P3Traits> PDelaunay;
 typedef CGAL::Delaunay_triangulation_3<K> Delaunay;
@@ -90,10 +91,11 @@ double tetrahedron_area(Tetrahedron_3 tetrahedron){
 
     double tot_area = 0;
     int i,j,k;
+    Triangle_3 facet;
     for (i = 0; i < 4; i++){
         for (j = i+1; j < 4; j++){
             for (k = j+1; k < 4; k++){
-                Triangle_3 facet = Triangle_3(tetrahedron[i], tetrahedron[j], tetrahedron[k]);
+                facet = Triangle_3(tetrahedron[i], tetrahedron[j], tetrahedron[k]);
                 tot_area += CGAL::sqrt(CGAL::to_double(facet.squared_area()));
             }
         }
@@ -103,6 +105,22 @@ double tetrahedron_area(Tetrahedron_3 tetrahedron){
     return tot_area;
 
 }
+
+//template<DT>
+double new_tetrahedron_area(ParDelaunayInfo tess, ParDelaunayInfo::Cell_handle cell){
+
+    double tot_area = 0;
+    int i,j,k;
+    for (i = 0; i<4; i++){
+        tot_area += CGAL::sqrt(CGAL::to_double(tess.triangle(cell,i).squared_area()));
+    }
+    
+
+    return tot_area;
+
+}
+
+
 
 DelaunayOutput cdelaunay(std::vector<double> X, std::vector<double> Y, std::vector<double> Z){
 
@@ -274,7 +292,7 @@ DelaunayOutput cdelaunay_periodic_extend(std::vector<double> X, std::vector<doub
             simplex_vertices[i] = cell->vertex(i)->point();
         }
         
-        buffer_sphere = Sphere_3(simplex_vertices[0],simplex_vertices[1],simplex_vertices[2],simplex_vertices[3]);
+        //buffer_sphere = Sphere_3(simplex_vertices[0],simplex_vertices[1],simplex_vertices[2],simplex_vertices[3]);
         //buffer_point = buffer_sphere.center();
         buffer_point = cell->circumcenter();
         output.x[k] = CGAL::to_double(buffer_point.x());
@@ -463,7 +481,6 @@ DelaunayOutput cdelaunay_periodic_full(std::vector<double> X, std::vector<double
 
     DelaunayOutput output;
     std::vector< std::pair<Point,size_t> >points;
-    
     std::chrono::time_point<Clock> tbeg {Clock::now()};
     
 
@@ -505,6 +522,7 @@ DelaunayOutput cdelaunay_periodic_full(std::vector<double> X, std::vector<double
     size_t size = points.size();
     std::cout<<"==> Number of points: "<<points.size()<<std::endl<<std::endl;
     size_t point_count = n_points;
+    tbeg = Clock::now();
     std::cout<<"Duplicating boundaries for periodic condition"<<std::endl;
     for(i=0;i<size;i++)
         if(points[i].first.x()<box_min[0]+cpy_range){
@@ -536,15 +554,14 @@ DelaunayOutput cdelaunay_periodic_full(std::vector<double> X, std::vector<double
             points.push_back(std::make_pair(Point_3(points[i].first.x(),points[i].first.y(),points[i].first.z()-box_size[2]), point_count++));
         }
     size=points.size();
-
+    std::cout << "==> Done in " << std::chrono::duration_cast<Second>(Clock::now() - tbeg).count() << "s" << std::endl;
     
     std::cout<<"==> Number of points: "<<points.size()<<std::endl;
     tbeg = Clock::now();
-    std::cout<<"==> Building Delaunay Triangulation."<<std::endl;
-    
+    std::cout<<"==> Building Delaunay Triangulation."<<std::endl;    
     DelaunayInfo tess(points.begin(), points.end());
-    std::cout << "Serial timing " << std::chrono::duration_cast<Second>(Clock::now() - tbeg).count() << "s" << std::endl;
     assert(tess.is_valid());
+    std::cout << "==> Done in " << std::chrono::duration_cast<Second>(Clock::now() - tbeg).count() << "s" << std::endl;
     points.clear();
     
     Point_3 simplex_vertices[4];
@@ -571,7 +588,7 @@ DelaunayOutput cdelaunay_periodic_full(std::vector<double> X, std::vector<double
     }
     
     
-    
+    tbeg = Clock::now();
     for(finite_cells_info cell=tess.finite_cells_begin();cell!=tess.finite_cells_end();cell++) {
         
         
@@ -580,7 +597,7 @@ DelaunayOutput cdelaunay_periodic_full(std::vector<double> X, std::vector<double
                                             cell->vertex(2)->point(),
                                             cell->vertex(3)->point());
         output.volume[k] = CGAL::to_double(buffer_tetrahedron.volume());
-        buffer_point = CGAL::circumcenter(buffer_tetrahedron);
+        buffer_point = cell->circumcenter();//CGAL::circumcenter(buffer_tetrahedron);
         output.x[k] = CGAL::to_double(buffer_point.x());
         output.y[k] = CGAL::to_double(buffer_point.y());
         output.z[k] = CGAL::to_double(buffer_point.z());
@@ -593,6 +610,8 @@ DelaunayOutput cdelaunay_periodic_full(std::vector<double> X, std::vector<double
         
         k++;
     }
+    std::cout << "==> Feature computation done in " << std::chrono::duration_cast<Second>(Clock::now() - tbeg).count() << "s" << std::endl;
+
     
 
 
@@ -647,6 +666,8 @@ DelaunayOutput cdelaunay_periodic_full_parallel(std::vector<double> X, std::vect
     size_t size = points.size();
     std::cout<<"==> Number of points: "<<points.size()<<std::endl<<std::endl;
     size_t point_count = n_points;
+
+    tbeg = Clock::now();
     std::cout<<"Duplicating boundaries for periodic condition"<<std::endl;
     for(i=0;i<size;i++)
         if(points[i].first.x()<box_min[0]+cpy_range){
@@ -679,14 +700,15 @@ DelaunayOutput cdelaunay_periodic_full_parallel(std::vector<double> X, std::vect
         }
     size=points.size();
 
-    
+    std::cout << "==> Done in " << std::chrono::duration_cast<Second>(Clock::now() - tbeg).count() << "s" << std::endl;
+
     std::cout<<"==> Number of points: "<<points.size()<<std::endl;
     tbeg = Clock::now();
     std::cout<<"==> Building Parallel Delaunay Triangulation."<<std::endl;
     ParDelaunayInfo::Lock_data_structure locking_ds(
-        CGAL::Bbox_3(CGAL::to_double(box_min[0])-cpy_range, CGAL::to_double(box_min[1]) - cpy_range, CGAL::to_double(box_min[2]) - cpy_range, CGAL::to_double(box_max[0]) + cpy_range, CGAL::to_double(box_max[1]) + cpy_range, CGAL::to_double(box_max[2]) + cpy_range), 70);
+        CGAL::Bbox_3(CGAL::to_double(box_min[0])-cpy_range, CGAL::to_double(box_min[1]) - cpy_range, CGAL::to_double(box_min[2]) - cpy_range, CGAL::to_double(box_max[0]) + cpy_range, CGAL::to_double(box_max[1]) + cpy_range, CGAL::to_double(box_max[2]) + cpy_range), 100);
     ParDelaunayInfo tess(points.begin(), points.end(), &locking_ds);
-    std::cout << "Parallel timing " << std::chrono::duration_cast<Second>(Clock::now() - tbeg).count() << "s" << std::endl;
+    std::cout << "==> Done in " << std::chrono::duration_cast<Second>(Clock::now() - tbeg).count() << "s" << std::endl;
     assert(tess.is_valid());
     points.clear();
     
@@ -713,17 +735,20 @@ DelaunayOutput cdelaunay_periodic_full_parallel(std::vector<double> X, std::vect
         output.dtfe[i] = 0;
     }
     
+    ParDelaunayInfo::Finite_cell_handles finite_cell_range = tess.finite_cell_handles();
+    
+    par_finite_cells_info cell=tess.finite_cells_begin();
+    std::cout << cell->vertex(0)->info() << std::endl;
+    std::cout << tess.tetrahedron(cell).volume() << std::endl;
+    std::cout << tess.triangle(cell, 0).squared_area() << std::endl;
     
     
-    for(par_finite_cells_info cell=tess.finite_cells_begin();cell!=tess.finite_cells_end();cell++) {
-        
-        
-        buffer_tetrahedron = Tetrahedron_3(cell->vertex(0)->point(),
-                                            cell->vertex(1)->point(),
-                                            cell->vertex(2)->point(),
-                                            cell->vertex(3)->point());
+    tbeg = Clock::now();   
+    for (auto& cell : finite_cell_range){
+    //for(par_finite_cells_info cell=tess.finite_cells_begin();cell!=tess.finite_cells_end();cell++) {    
+        buffer_tetrahedron = tess.tetrahedron(cell);
         output.volume[k] = CGAL::to_double(buffer_tetrahedron.volume());
-        buffer_point = CGAL::circumcenter(buffer_tetrahedron);
+        buffer_point = cell->circumcenter();//CGAL::circumcenter(buffer_tetrahedron);
         output.x[k] = CGAL::to_double(buffer_point.x());
         output.y[k] = CGAL::to_double(buffer_point.y());
         output.z[k] = CGAL::to_double(buffer_point.z());
@@ -733,11 +758,12 @@ DelaunayOutput cdelaunay_periodic_full_parallel(std::vector<double> X, std::vect
             output.vertices[i].push_back(cell->vertex(i)->info());
         }
         output.area[k] = tetrahedron_area(buffer_tetrahedron);
-        
+        //output.area[k] = new_tetrahedron_area(tess, cell);
         k++;
     }
     
-
+    
+    std::cout << "==> Feature computation done in " << std::chrono::duration_cast<Second>(Clock::now() - tbeg).count() << "s" << std::endl;
 
     return output;
 

@@ -55,14 +55,45 @@ if __name__ == '__main__':
     s = time.time()
     voids, dtfe = get_void_catalog_full(points_raw, 
                                 periodic=periodic, 
-                                parallel = False
+                                parallel = True
                                 )
     print(f"CGAL took {time.time() - s} s", flush=True)
 
     fig, axes = plt.subplots(2, 4, figsize=(15, 7))
     ax = axes.T.ravel()
-    
+    mask = (voids[:,:3] > 0).all(axis=1) & (voids[:,:3] < BOX_SIZE).all(axis=1)
+    voids = voids[mask]
+    log_bins = np.logspace(-3, 5, 100)
+    bins = np.linspace(0, 60, 100)
+    ax[0].hist(voids[:,0], bins=100, histtype='step', label='x')
+    ax[0].hist(voids[:,1], bins=100, histtype='step', label='y')
+    ax[0].hist(voids[:,2], bins=100, histtype='step', label='z')
+    ax[0].legend()
 
+    ax[1].hist(voids[:,3], bins=bins, histtype='step', label='r')
+    for t in [0, -0.3, -0.5, -0.7, -0.9]:
+        ax[1].hist(voids[voids[:,5] < t,3], bins=bins, histtype='step', label='r $\delta_v<%.1f$'%t)
+    ax[1].legend()
+    ax[1].axvline(16, ls=':', c= 'k', label='r=16 Mpc/h')
+
+    ax[2].hist(voids[:,4], bins=log_bins, histtype='step', label='vol')
+    ax[2].legend()
+    ax[2].set_yscale('log')
+    ax[2].set_xscale('log')
+#
+    ax[3].hist(voids[:,6], bins=log_bins, histtype='step', label='area')
+    ax[3].legend()
+    #ax[3].set_yscale('log')ax[7].set_xlabel('$s$ [Mpc/$h$]')
+    ax[3].set_xscale('log')
+#
+    sphericity = (36 * np.pi * voids[:,4]**2)**(1./3) / voids[:,6]
+#
+    ax[6].hist(sphericity, bins=100, histtype='step', label='sphericity')
+    ax[6].legend()
+
+    fig.savefig('tests/dtfe.png', dpi=200)
+    
+    exit()
     x = np.linspace(0, BOX_SIZE, GRID_SIZE)
     X, Y, Z = np.meshgrid(x, x, x)
     
@@ -154,33 +185,4 @@ if __name__ == '__main__':
 
     fig.savefig('tests/dtfe.png', dpi=200)
 
-    mask = (voids[:,:3] > 0).all(axis=1) & (voids[:,:3] < BOX_SIZE).all(axis=1)
-    voids = voids[mask]
-    log_bins = np.logspace(-3, 5, 100)
-    ax[0].hist(voids[:,0], bins=100, histtype='step', label='x')
-    ax[0].hist(voids[:,1], bins=100, histtype='step', label='y')
-    ax[0].hist(voids[:,2], bins=100, histtype='step', label='z')
-    ax[0].legend()
-
-    ax[1].hist(voids[:,3], bins=100, histtype='step', label='r')
-    for t in [0, -0.3, -0.5, -0.7, -0.9]:
-        ax[1].hist(voids[void_delta[mask] < t,3], bins=100, histtype='step', label='r $\delta_v<%.1f$'%t)
-    ax[1].legend()
-    ax[1].axvline(16, ls=':', c= 'k', label='r=16 Mpc/h')
-
-    ax[2].hist(voids[:,4], bins=log_bins, histtype='step', label='vol')
-    ax[2].legend()
-    #ax[2].set_yscale('log')
-    ax[2].set_xscale('log')
-
-    ax[3].hist(voids[:,6], bins=log_bins, histtype='step', label='area')
-    ax[3].legend()
-    #ax[3].set_yscale('log')ax[7].set_xlabel('$s$ [Mpc/$h$]')
-    ax[3].set_xscale('log')
-
-    sphericity = (36 * np.pi * voids[:,4]**2)**(1./3) / voids[:,6]
-
-    ax[6].hist(sphericity, bins=100, histtype='step', label='sphericity')
-    ax[6].legend()
-
-    fig.savefig('tests/dtfe.png', dpi=200)
+    

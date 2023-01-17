@@ -6,6 +6,7 @@ cmake_minimum_required(VERSION 3.1...3.23)
 project( pydive )
 list(APPEND CMAKE_MODULE_PATH "${CGAL_DIR}/cmake/modules/")
 find_package( TBB REQUIRED)
+find_package( OpenMP REQUIRED)
 
 
 # CGAL and its components

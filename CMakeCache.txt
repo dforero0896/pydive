@@ -46,6 +46,9 @@ CGAL_TEST_DRAW_FUNCTIONS:BOOL=OFF
 // wrappers
 CGAL_WITH_GMPXX:BOOL=ON
 
+//No help, variable specified on the command line.
+CMAKECXX_STANDARD:UNINITIALIZED=17
+
 //Path to a program.
 CMAKE_ADDR2LINE:FILEPATH=/opt/ebsofts/binutils/2.37-GCCcore-11.2.0/bin/addr2line
 
@@ -85,8 +88,11 @@ CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG
 //Flags used by the CXX compiler during RELWITHDEBINFO builds.
 CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 
-//C compiler
-CMAKE_C_COMPILER:STRING=/opt/ebsofts/GCCcore/11.2.0/bin/gcc
+//No help, variable specified on the command line.
+CMAKE_CXX_STANDARD:UNINITIALIZED=17
+
+//No help, variable specified on the command line.
+CMAKE_C_COMPILER:UNINITIALIZED=gcc
 
 //A wrapper around 'ar' adding the appropriate '--plugin' option
 // for the GCC compiler
@@ -238,6 +244,9 @@ CMAKE_STRIP:FILEPATH=/opt/ebsofts/binutils/2.37-GCCcore-11.2.0/bin/strip
 //No help, variable specified on the command line.
 CMAKE_VERBOSE_MAKEFILE:BOOL=ON
 
+//No help, variable specified on the command line.
+CXX_STANDARD:UNINITIALIZED=17
+
 //Create an annotated .html file when compiling *.pyx.
 CYTHON_ANNOTATE:BOOL=OFF
 
@@ -272,6 +281,24 @@ MPFR_INCLUDE_DIR:PATH=/home/astro/dforero/.conda/envs/main/include
 MPFR_LIBRARIES:FILEPATH=/home/astro/dforero/.conda/envs/main/lib/libmpfr.so
 
 MPFR_LIBRARIES_DIR:FILEPATH=/home/astro/dforero/.conda/envs/main/lib
+
+//CXX compiler flags for OpenMP parallelization
+OpenMP_CXX_FLAGS:STRING=-fopenmp
+
+//CXX compiler libraries for OpenMP parallelization
+OpenMP_CXX_LIB_NAMES:STRING=gomp;pthread
+
+//C compiler flags for OpenMP parallelization
+OpenMP_C_FLAGS:STRING=-fopenmp
+
+//C compiler libraries for OpenMP parallelization
+OpenMP_C_LIB_NAMES:STRING=gomp;pthread
+
+//Path to the gomp library for OpenMP
+OpenMP_gomp_LIBRARY:FILEPATH=/home/astro/dforero/.conda/envs/main/lib/libgomp.so
+
+//Path to the pthread library for OpenMP
+OpenMP_pthread_LIBRARY:FILEPATH=/lib64/libpthread.so
 
 //Add module pydive
 PYTHON_ENABLE_MODULE_pydive:BOOL=ON
@@ -485,12 +512,42 @@ FIND_PACKAGE_MESSAGE_DETAILS_Cython:INTERNAL=[/home/astro/dforero/.conda/envs/ma
 FIND_PACKAGE_MESSAGE_DETAILS_GMP:INTERNAL=[/home/astro/dforero/.conda/envs/main/lib/libgmp.so][/home/astro/dforero/.conda/envs/main/include][v()]
 //Details about finding MPFR
 FIND_PACKAGE_MESSAGE_DETAILS_MPFR:INTERNAL=[/home/astro/dforero/.conda/envs/main/lib/libmpfr.so][/home/astro/dforero/.conda/envs/main/include][v()]
+//Details about finding OpenMP
+FIND_PACKAGE_MESSAGE_DETAILS_OpenMP:INTERNAL=[TRUE][TRUE][c ][v4.5()]
+//Details about finding OpenMP_C
+FIND_PACKAGE_MESSAGE_DETAILS_OpenMP_C:INTERNAL=[-fopenmp][/home/astro/dforero/.conda/envs/main/lib/libgomp.so][/lib64/libpthread.so][/home/astro/dforero/.conda/envs/main/lib/libgomp.so][/lib64/libpthread.so][v4.5()]
+//Details about finding OpenMP_CXX
+FIND_PACKAGE_MESSAGE_DETAILS_OpenMP_CXX:INTERNAL=[-fopenmp][/home/astro/dforero/.conda/envs/main/lib/libgomp.so][/lib64/libpthread.so][/home/astro/dforero/.conda/envs/main/lib/libgomp.so][/lib64/libpthread.so][v4.5()]
 //Details about finding PythonInterp
 FIND_PACKAGE_MESSAGE_DETAILS_PythonInterp:INTERNAL=[/home/astro/dforero/.conda/envs/main/bin/python][v3.8.12()]
 //Details about finding PythonLibs
 FIND_PACKAGE_MESSAGE_DETAILS_PythonLibs:INTERNAL=[/home/astro/dforero/.conda/envs/main/lib/libpython3.8.so][/home/astro/dforero/.conda/envs/main/include/python3.8][v3.8.12()]
 //Details about finding Threads
 FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
+//Result of TRY_COMPILE
+OpenMP_COMPILE_RESULT_CXX_fopenmp:INTERNAL=TRUE
+//Result of TRY_COMPILE
+OpenMP_COMPILE_RESULT_C_fopenmp:INTERNAL=TRUE
+//ADVANCED property for variable: OpenMP_CXX_FLAGS
+OpenMP_CXX_FLAGS-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: OpenMP_CXX_LIB_NAMES
+OpenMP_CXX_LIB_NAMES-ADVANCED:INTERNAL=1
+//CXX compiler's OpenMP specification date
+OpenMP_CXX_SPEC_DATE:INTERNAL=201511
+//ADVANCED property for variable: OpenMP_C_FLAGS
+OpenMP_C_FLAGS-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: OpenMP_C_LIB_NAMES
+OpenMP_C_LIB_NAMES-ADVANCED:INTERNAL=1
+//C compiler's OpenMP specification date
+OpenMP_C_SPEC_DATE:INTERNAL=201511
+//Result of TRY_COMPILE
+OpenMP_SPECTEST_CXX_:INTERNAL=TRUE
+//Result of TRY_COMPILE
+OpenMP_SPECTEST_C_:INTERNAL=TRUE
+//ADVANCED property for variable: OpenMP_gomp_LIBRARY
+OpenMP_gomp_LIBRARY-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: OpenMP_pthread_LIBRARY
+OpenMP_pthread_LIBRARY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: PYTHON_ENABLE_MODULE_pydive
 PYTHON_ENABLE_MODULE_pydive-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: PYTHON_EXECUTABLE

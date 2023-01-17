@@ -101,11 +101,13 @@ pydive_EXTERNAL_OBJECTS =
 pydive/pydive.so: pydive/CMakeFiles/pydive.dir/pydive.cpp.o
 pydive/pydive.so: pydive/CMakeFiles/pydive.dir/build.make
 pydive/pydive.so: /home/astro/dforero/.conda/envs/main/lib/libpython3.8.so
+pydive/pydive.so: /opt/ebsofts/tbb/2020.3-GCCcore-11.2.0/lib/libtbb.so.2
 pydive/pydive.so: /home/astro/dforero/.conda/envs/main/lib/libgmpxx.so
 pydive/pydive.so: /home/astro/dforero/.conda/envs/main/lib/libmpfr.so
 pydive/pydive.so: /home/astro/dforero/.conda/envs/main/lib/libgmp.so
-pydive/pydive.so: /opt/ebsofts/tbb/2020.3-GCCcore-11.2.0/lib/libtbb.so.2
 pydive/pydive.so: /opt/ebsofts/tbb/2020.3-GCCcore-11.2.0/lib/libtbbmalloc.so.2
+pydive/pydive.so: /home/astro/dforero/.conda/envs/main/lib/libgomp.so
+pydive/pydive.so: /lib64/libpthread.so
 pydive/pydive.so: pydive/CMakeFiles/pydive.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/astro/dforero/codes/pydive/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX shared module pydive.so"
 	cd /home/astro/dforero/codes/pydive/pydive && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/pydive.dir/link.txt --verbose=$(VERBOSE)

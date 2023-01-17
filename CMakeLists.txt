@@ -8,7 +8,9 @@ project( pydive )
 # 'include()' command, 'find_package()' command.
 set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/cmake )
 list(APPEND CMAKE_MODULE_PATH "${CGAL_DIR}/cmake/modules/")
+add_definitions( -DCGAL_TRIANGULATION_3_PROFILING)
 find_package( TBB REQUIRED)
+find_package( OpenMP REQUIRED)
 
 
 # Include the CMake script UseCython.cmake.  This defines add_cython_module().
@@ -25,10 +27,10 @@ add_custom_target( ReplicatePythonSourceTree ALL ${CMAKE_COMMAND} -P
   ${CMAKE_CURRENT_BINARY_DIR}
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} )
 
-include_directories( ${CMAKE_CURRENT_LIST_DIR}/pydive)
+include_directories( ${CMAKE_CURRENT_LIST_DIR}/pydive ${TBB_INCLUDE_DIRS})
 set_source_files_properties(
   ${CMAKE_CURRENT_LIST_DIR}/pydive/pydive.pyx
-  PROPERTIES CYTHON_IS_CXX TRUE )
+  PROPERTIES CYTHON_IS_CXX TRUE)
 
 # Process the CMakeLists.txt in the 'src' and 'bin' directory.
 add_subdirectory( pydive )
