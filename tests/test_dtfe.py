@@ -15,10 +15,10 @@ import matplotlib.colors as mcolors
 import pickle
 import os
 
-import MAS_library as MASL
-import smoothing_library as SL
-import Pk_library as PKL
-import readfof
+#import MAS_library as MASL
+#import smoothing_library as SL
+#import Pk_library as PKL
+#import readfof
 
 
 HALOS="/hpcstorage/zhaoc/PATCHY_BOX/pre-recon/halo/BDM_Apk/CATALPTCICz0.562G960S1010008301.dat"
@@ -61,7 +61,7 @@ if __name__ == '__main__':
     fig, axes = plt.subplots(2, 4, figsize=(15, 7))
     ax = axes.T.ravel()
     
-
+    exit()
     x = np.linspace(0, BOX_SIZE, GRID_SIZE)
     X, Y, Z = np.meshgrid(x, x, x)
     
