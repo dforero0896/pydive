@@ -127,10 +127,10 @@ cdef extern from "delaunay_backend.cpp":
         vector[size_t] vertices[4]
         size_t n_simplices
     DelaunayOutput cdelaunay(vector[double] X, vector[double] Y, vector[double] Z) nogil
-    DelaunayOutput cdelaunay_periodic_extend(vector[double] X, vector[double] Y, vector[double] Z) nogil
-    DelaunayOutput cdelaunay_periodic(vector[double] X, vector[double] Y, vector[double] Z) nogil
+    DelaunayOutput cdelaunay_periodic_extend(vector[double] X, vector[double] Y, vector[double] Z, vector[double] box_min, vector[double] box_max, double cpy_range) nogil
+    DelaunayOutput cdelaunay_periodic(vector[double] X, vector[double] Y, vector[double] Z, vector[double] box_min, vector[double] box_max) nogil
     DelaunayOutput cdelaunay_full(vector[double] X, vector[double] Y, vector[double] Z) nogil
-    DelaunayOutput cdelaunay_periodic_full(vector[double] X, vector[double] Y, vector[double] Z) nogil
+    DelaunayOutput cdelaunay_periodic_full(vector[double] X, vector[double] Y, vector[double] Z, vector[double] box_min, vector[double] box_max, double cpy_range) nogil
 
 cdef void matrix_invert(gsl_matrix *matrix, gsl_matrix *matrix_inv, int size) nogil:
 
@@ -150,11 +150,14 @@ cdef void matrix_invert(gsl_matrix *matrix, gsl_matrix *matrix_inv, int size) no
     
 def get_void_catalog_cgal(double[:,:] points,
                         bint periodic = False,
-                        int periodic_mode = 0
+                        int periodic_mode = 0,
+                        list box_min = [0., 0., 0.],
+                        list box_max = [0., 0., 0.],
+                        double cpy_range = 0.,
                         ):
 
     cdef Py_ssize_t i,k
-    cdef vector[double] in_x, in_y, in_z
+    cdef vector[double] in_x, in_y, in_z, _box_min, _box_max
     
     
     
@@ -171,10 +174,13 @@ def get_void_catalog_cgal(double[:,:] points,
     if not periodic:
         voids = cdelaunay(in_x, in_y, in_z)
     else:
+        for i in range(3):
+            _box_min.push_back(box_min[i])
+            _box_max.push_back(box_max[i])
         if periodic_mode == 0:
-            voids = cdelaunay_periodic_extend(in_x, in_y, in_z)
+            voids = cdelaunay_periodic_extend(in_x, in_y, in_z, _box_min, _box_max, cpy_range)
         elif periodic_mode == 1:
-            voids = cdelaunay_periodic(in_x, in_y, in_z)
+            voids = cdelaunay_periodic(in_x, in_y, in_z, _box_min, _box_max)
         else:
             raise ValueError("periodic_mode must be 0 (extend bounds) or 1 (periodic data structures).")
         
@@ -201,10 +207,13 @@ def get_void_catalog_cgal(double[:,:] points,
 def get_void_catalog_full(double[:,:] points,
                         bint periodic=False,
                         int n_threads = 16,
-                        double p = 2):
+                        double p = 2,
+                        list box_min = [0., 0., 0.],
+                        list box_max = [0., 0., 0.],
+                        double cpy_range = 0.,):
 
     cdef Py_ssize_t i,k,j
-    cdef vector[double] in_x, in_y, in_z
+    cdef vector[double] in_x, in_y, in_z, _box_min, _box_max
        
     in_x.reserve(points.shape[0])
     in_y.reserve(points.shape[0])
@@ -219,8 +228,11 @@ def get_void_catalog_full(double[:,:] points,
     if not periodic:
         voids = cdelaunay_full(in_x, in_y, in_z)
     else:
-        voids = cdelaunay_periodic_full(in_x, in_y, in_z)
-        
+        for i in range(3):
+            _box_min.push_back(box_min[i])
+            _box_max.push_back(box_max[i])
+        voids = cdelaunay_periodic_full(in_x, in_y, in_z, _box_min, _box_max, cpy_range)
+    
     cdef size_t n_simplices
     in_x.clear()
     in_y.clear()
@@ -228,7 +240,8 @@ def get_void_catalog_full(double[:,:] points,
     
     cdef double w, numerator
     
-
+    
+    fflush(stdout)
 
     n_simplices = voids.n_simplices
     output = np.zeros((n_simplices, 7), dtype=np.double)
@@ -247,49 +260,7 @@ def get_void_catalog_full(double[:,:] points,
     printf("==> Copying voids and interpolating\n")
     fflush(stdout)
     
-    #for k in prange(n_simplices, nogil=True, num_threads=n_threads):
-    """
-    # Compute gradients
-    gradients = np.zeros((n_simplices, 3), dtype=np.double)
-    cdef double [:,:] gradients_view = gradients
-    cdef gsl_matrix * A = gsl_matrix_alloc(3, 3)
-    cdef gsl_matrix * Ainv = gsl_matrix_alloc(3, 3)
-    cdef gsl_vector * rho = gsl_vector_alloc(3)
-    cdef gsl_vector * grad = gsl_vector_alloc(3)
-    cdef size_t ind_a, ind_b
-    
-    for k in range(n_simplices):
-        ind_b = <size_t>voids.vertices[0][k]
-        printf("%ld, %ld\n", ind_a, ind_b)
-        fflush(stdout)
-        if voids.r[k] > 50: continue
-        for j in range(3):
-            ind_a = <size_t>voids.vertices[j+1][k]
-            gsl_matrix_set(A, 0, j, in_x[ind_a] - in_x[ind_b])
-            gsl_matrix_set(A, 1, j, in_y[ind_a] - in_y[ind_b])
-            gsl_matrix_set(A, 2, j, in_z[ind_a] - in_z[ind_b])
-            gsl_vector_set(rho, j, voids.dtfe[ind_a] - voids.dtfe[ind_b])
-            printf("%lf %lf %lf\n", in_x[ind_a] - in_x[ind_b], in_y[ind_a] - in_y[ind_b], in_z[ind_a] - in_z[ind_b])
-            fflush(stdout)
-        matrix_invert(A, Ainv, 3)
-        gsl_blas_dgemv(CblasNoTrans,
-                        1.,
-                        Ainv, 
-                        rho, 
-                        0., 
-                        grad)
-        gradients_view[k, 0] = gsl_vector_get(grad,0)
-        gradients_view[k, 1] = gsl_vector_get(grad,1)
-        gradients_view[k, 2] = gsl_vector_get(grad,2)
-        
-        
-    gsl_matrix_free(A)
-    gsl_matrix_free(Ainv)
-    gsl_vector_free(rho)
-    gsl_vector_free(grad)
-    """    
-    
-    
+   
     for k in range(n_simplices):
         output_view[k,0] = voids.x[k]
         output_view[k,1] = voids.y[k]

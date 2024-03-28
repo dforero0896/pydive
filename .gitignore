@@ -15,6 +15,11 @@ tests/CAT*
 *.conf
 *.dat
 *.npy
+pydive/CMake*
+build
+build/*
+*.cmake
+pydive/__pycache__
 <<<<<<< HEAD
 !dtfe.png
 =======
