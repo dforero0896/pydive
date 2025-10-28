@@ -9,9 +9,7 @@ print(os.environ['PATH'])
 
 
 os.system("wget https://github.com/CGAL/cgal/releases/download/v6.1/CGAL-6.1.tar.xz")
-os.system("pwd")
-os.system("ls -l")
-os.system("tar -xvf ./src/pydive/CGAL-6.1.tar.xz")
+os.system("tar -xvf CGAL-6.1.tar.xz")
 
 
 
