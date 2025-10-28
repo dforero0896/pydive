@@ -10,7 +10,7 @@ print(os.environ['PATH'])
 
 os.system("wget https://github.com/CGAL/cgal/releases/download/v6.1/CGAL-6.1.tar.xz")
 os.system("tar -xvf CGAL-6.1.tar.xz")
-os.system("rm pydive.cpp"
+os.system("rm pydive.cpp")
 os.system("./CGAL-5.4/bin/cgal_create_CMakeLists delaunay_backend")
 os.system("cmake -DCGAL_DIR=./CGAL-5.4/lib/cmake/CGAL -DCMAKE_BUILD_TYPE=Release .")
 os.system("make")
