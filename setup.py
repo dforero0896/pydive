@@ -30,7 +30,7 @@ myext = Extension("pydive.pydive",
                             #'pydive/delaunay_backend.cpp'
                             ],
                   include_dirs=[numpy.get_include(), 
-                                os.environ['HOME'] + '/lib/CGAL-6.1/include', 
+                                'CGAL-6.1/include', 
 				#'/global/common/software/nersc/cori-2022q1/spack/cray-cnl7-haswell/gsl-2.7-ihnf7gi/include',
 				#"/global/homes/d/dforero/.conda/envs/jax/include"
                                 ],
