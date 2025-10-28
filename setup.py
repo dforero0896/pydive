@@ -4,7 +4,18 @@ import numpy
 import os
 print(os.environ['LD_LIBRARY_PATH'])
 print(os.environ['PATH'])
+
+
+os.system("mkdir -v $HOME/lib")
+os.system("cd $HOME/lib")
+os.system("wget https://github.com/CGAL/cgal/releases/download/v6.1/CGAL-6.1.tar.xz")
+os.system("tar -xvf https://github.com/CGAL/cgal/releases/download/v6.1/CGAL-6.1.tar.xz")
+
+
+
 os.system("bash run_cmake.sh")
+
+
 
 extra_compile_args=['-fPIC']
 extra_link_args=[]
@@ -19,7 +30,7 @@ myext = Extension("pydive.pydive",
                             #'pydive/delaunay_backend.cpp'
                             ],
                   include_dirs=[numpy.get_include(), 
-                                '/global/u1/d/dforero/lib/CGAL-5.4/include', 
+                                os.environ['HOME'] + '/lib/CGAL-6.1/include', 
 				#'/global/common/software/nersc/cori-2022q1/spack/cray-cnl7-haswell/gsl-2.7-ihnf7gi/include',
 				#"/global/homes/d/dforero/.conda/envs/jax/include"
                                 ],
