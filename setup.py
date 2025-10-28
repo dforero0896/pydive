@@ -16,7 +16,7 @@ os.system("tar -xvf https://github.com/CGAL/cgal/releases/download/v6.1/CGAL-6.1
 os.system("bash run_cmake.sh")
 
 
-
+exit()
 extra_compile_args=['-fPIC']
 extra_link_args=[]
 OMP=True
