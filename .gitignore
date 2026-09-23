@@ -1,13 +1,39 @@
-```
-# Python
+```gitignore
+# Python cache files
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# Images (generated results)
-*.png
+# Dependencies
+.venv/
+venv/
+env/
+.env
+.env.local
+*.env.*
 
-# Results directories
-results_*/
+# Logs
+*.log
+
+# Coverage reports
+.coverage
+coverage/
+htmlcov/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# Distribution artifacts
+dist/
+build/
+*.egg-info/
+
+# Testing
+.pytest_cache/
+.mypy_cache/
 ```
