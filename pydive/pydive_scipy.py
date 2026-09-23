@@ -24,6 +24,12 @@ def compute_circumcenters_and_radii(vertices: np.ndarray, points: np.ndarray) ->
     """
     Compute circumcenters and radii for all tetrahedra.
     
+    Uses the formula from 'Computing the Circumcenter of a Tetrahedron' by Christer Ericson:
+    C = p0 + (|a|^2(b×c) + |b|^2(c×a) + |c|^2(a×b)) / (2*a·(b×c))
+    where a = p1-p0, b = p2-p0, c = p3-p0
+    
+    This formula is symmetric and numerically stable.
+    
     Parameters
     ----------
     vertices : ndarray (n_simplices, 4)
@@ -49,59 +55,70 @@ def compute_circumcenters_and_radii(vertices: np.ndarray, points: np.ndarray) ->
         p2 = points[vertices[k, 2]]
         p3 = points[vertices[k, 3]]
         
-        # Compute circumcenter using the formula from geometric primitives
-        # Based on: https://en.wikipedia.org/wiki/Circumscribed_sphere#Cartesian_coordinates
-        ax, ay, az = p0
-        bx, by, bz = p1
-        cx, cy, cz = p2
-        dx, dy, dz = p3
+        # Edge vectors from p0
+        ax = p1[0] - p0[0]
+        ay = p1[1] - p0[1]
+        az = p1[2] - p0[2]
         
-        # Compute differences
-        bax = bx - ax
-        bay = by - ay
-        baz = bz - az
-        cax = cx - ax
-        cay = cy - ay
-        caz = cz - az
-        dax = dx - ax
-        day = dy - ay
-        daz = dz - az
+        bx = p2[0] - p0[0]
+        by = p2[1] - p0[1]
+        bz = p2[2] - p0[2]
         
-        # Compute cross products and dot products
-        cross_bc_x = bay * caz - baz * cay
-        cross_bc_y = baz * cax - bax * caz
-        cross_bc_z = bax * cay - bay * cax
+        cx = p3[0] - p0[0]
+        cy = p3[1] - p0[1]
+        cz = p3[2] - p0[2]
         
-        cross_bd_x = bay * daz - baz * day
-        cross_bd_y = baz * dax - bax * daz
-        cross_bd_z = bax * day - bay * dax
+        # Cross products: b×c, c×a, a×b
+        bc_x = by*cz - bz*cy
+        bc_y = bz*cx - bx*cz
+        bc_z = bx*cy - by*cx
         
-        cross_cd_x = cay * daz - caz * day
-        cross_cd_y = caz * dax - cax * daz
-        cross_cd_z = cax * day - cay * dax
+        ca_x = cy*az - cz*ay
+        ca_y = cz*ax - cx*az
+        ca_z = cx*ay - cy*ax
         
-        # Compute determinant
-        det = 2.0 * (bax * cross_cd_x + bay * cross_cd_y + baz * cross_cd_z)
+        ab_x = ay*bz - az*by
+        ab_y = az*bx - ax*bz
+        ab_z = ax*by - ay*bx
         
-        if abs(det) < 1e-15:
-            # Degenerate tetrahedron, skip
+        # Squared lengths of edge vectors
+        a2 = ax*ax + ay*ay + az*az
+        b2 = bx*bx + by*by + bz*bz
+        c2 = cx*cx + cy*cy + cz*cz
+        
+        # Denominator: 2 * a·(b×c)
+        denom = 2.0 * (ax*bc_x + ay*bc_y + az*bc_z)
+        
+        if abs(denom) < 1e-15:
+            # Degenerate tetrahedron
             continue
         
-        # Compute squared lengths
-        bax2 = bax*bax + bay*bay + baz*baz
-        cax2 = cax*cax + cay*cay + caz*caz
-        dax2 = dax*dax + day*day + daz*daz
+        inv_denom = 1.0 / denom
         
-        # Compute circumcenter
-        centers[k, 0] = ax + (bax2 * cross_cd_x + cax2 * cross_bd_x + dax2 * cross_bc_x) / det
-        centers[k, 1] = ay + (bax2 * cross_cd_y + cax2 * cross_bd_y + dax2 * cross_bc_y) / det
-        centers[k, 2] = az + (bax2 * cross_cd_z + cax2 * cross_bd_z + dax2 * cross_bc_z) / det
+        # Numerator: |a|^2(b×c) + |b|^2(c×a) + |c|^2(a×b)
+        num_x = a2*bc_x + b2*ca_x + c2*ab_x
+        num_y = a2*bc_y + b2*ca_y + c2*ab_y
+        num_z = a2*bc_z + b2*ca_z + c2*ab_z
         
-        # Compute radius
-        dx_center = centers[k, 0] - ax
-        dy_center = centers[k, 1] - ay
-        dz_center = centers[k, 2] - az
-        radii[k] = np.sqrt(dx_center*dx_center + dy_center*dy_center + dz_center*dz_center)
+        # Circumcenter relative to p0
+        ux = num_x * inv_denom
+        uy = num_y * inv_denom
+        uz = num_z * inv_denom
+        
+        # Absolute circumcenter
+        cx_abs = p0[0] + ux
+        cy_abs = p0[1] + uy
+        cz_abs = p0[2] + uz
+        
+        centers[k, 0] = cx_abs
+        centers[k, 1] = cy_abs
+        centers[k, 2] = cz_abs
+        
+        # Radius = distance from center to any vertex (use p0)
+        dx = cx_abs - p0[0]
+        dy = cy_abs - p0[1]
+        dz = cz_abs - p0[2]
+        radii[k] = np.sqrt(dx*dx + dy*dy + dz*dz)
     
     return centers, radii
 
@@ -301,7 +318,7 @@ def interpolate_dtfe_to_centers(vertices: np.ndarray, dtfe: np.ndarray,
     return dtfe_interp
 
 
-def get_void_catalog_scipy(points: np.ndarray, periodic: bool = False) -> np.ndarray:
+def get_void_catalog_scipy(points: np.ndarray, mode: str = 'open', boxsize: float = None) -> np.ndarray:
     """
     Get basic void catalog using SciPy backend.
     
@@ -309,27 +326,84 @@ def get_void_catalog_scipy(points: np.ndarray, periodic: bool = False) -> np.nda
     ----------
     points : ndarray (N, 3)
         Input point coordinates
-    periodic : bool
-        Whether to use periodic boundary conditions (not implemented)
+    mode : str, optional
+        Boundary mode: 'open' (no padding), 'periodic' (pad with periodic images),
+        or 'lightcone' (same as periodic for now). Default is 'open'.
+    boxsize : float, optional
+        Box size for periodic boundary conditions. If None, estimated from
+        point distribution as max(bbox_max - bbox_min).
         
     Returns
     -------
     output : ndarray (n_simplices, 4)
         Array with columns [x, y, z, r] for each simplex circumcenter
     """
-    if periodic:
-        raise NotImplementedError("Periodic boundary conditions not implemented in scipy backend")
-    
     points = np.ascontiguousarray(points, dtype=np.double)
     
-    # Compute Delaunay triangulation
-    tri = Delaunay(points)
-    
-    # Get vertex indices for all tetrahedra
-    vertices = tri.simplices.astype(np.int64)
-    
-    # Compute circumcenters and radii (all in numba)
-    centers, radii = compute_circumcenters_and_radii(vertices, points)
+    if mode in ['periodic', 'lightcone']:
+        # Estimate box size if not provided
+        if boxsize is None:
+            bbox_min = points.min(axis=0)
+            bbox_max = points.max(axis=0)
+            box_size_vec = bbox_max - bbox_min
+            boxsize = max(box_size_vec)
+        
+        # Compute mean inter-particle spacing
+        n_points = len(points)
+        mean_spacing = boxsize / (n_points ** (1/3))
+        
+        # Pad by 2x mean spacing
+        pad_width = 2 * mean_spacing
+        
+        # Create periodic images
+        padded_points = []
+        shifts = [-boxsize, np.zeros(3), boxsize]
+        for dx in shifts:
+            for dy in shifts:
+                for dz in shifts:
+                    shift = np.array(dx) + np.array(dy) + np.array(dz)
+                    if np.all(shift == 0):
+                        padded_points.append(points)
+                    else:
+                        padded_points.append(points + shift)
+        
+        padded_points = np.vstack(padded_points)
+        
+        # Define original box bounds (assume centered or from 0)
+        if boxsize is not None:
+            # Assume box from 0 to boxsize if points are in that range
+            bbox_min_orig = points.min(axis=0)
+            bbox_max_orig = points.max(axis=0)
+            # Use the original bounding box
+            original_min = bbox_min_orig
+            original_max = bbox_max_orig
+        else:
+            original_min = points.min(axis=0)
+            original_max = points.max(axis=0)
+        
+        # Compute Delaunay on padded points
+        tri = Delaunay(padded_points)
+        vertices = tri.simplices.astype(np.int64)
+        
+        # Compute circumcenters and radii
+        centers, radii = compute_circumcenters_and_radii(vertices, padded_points)
+        
+        # Filter to keep only voids with centers in original box
+        mask = ((centers[:, 0] >= original_min[0]) & (centers[:, 0] <= original_max[0]) &
+                (centers[:, 1] >= original_min[1]) & (centers[:, 1] <= original_max[1]) &
+                (centers[:, 2] >= original_min[2]) & (centers[:, 2] <= original_max[2]))
+        
+        centers = centers[mask]
+        radii = radii[mask]
+    else:
+        # Compute Delaunay triangulation
+        tri = Delaunay(points)
+        
+        # Get vertex indices for all tetrahedra
+        vertices = tri.simplices.astype(np.int64)
+        
+        # Compute circumcenters and radii (all in numba)
+        centers, radii = compute_circumcenters_and_radii(vertices, points)
     
     # Combine into output array
     output = np.column_stack([centers, radii])
@@ -337,7 +411,7 @@ def get_void_catalog_scipy(points: np.ndarray, periodic: bool = False) -> np.nda
     return output
 
 
-def get_void_catalog_full_scipy(points: np.ndarray, periodic: bool = False) -> Tuple[np.ndarray, np.ndarray]:
+def get_void_catalog_full_scipy(points: np.ndarray, mode: str = 'open', boxsize: float = None) -> Tuple[np.ndarray, np.ndarray]:
     """
     Get full void catalog with DTFE, volumes, and areas using SciPy backend.
     
@@ -345,8 +419,12 @@ def get_void_catalog_full_scipy(points: np.ndarray, periodic: bool = False) -> T
     ----------
     points : ndarray (N, 3)
         Input point coordinates
-    periodic : bool
-        Whether to use periodic boundary conditions (not implemented)
+    mode : str, optional
+        Boundary mode: 'open' (no padding), 'periodic' (pad with periodic images),
+        or 'lightcone' (same as periodic for now). Default is 'open'.
+    boxsize : float, optional
+        Box size for periodic boundary conditions. If None, estimated from
+        point distribution as max(bbox_max - bbox_min).
         
     Returns
     -------
@@ -355,25 +433,81 @@ def get_void_catalog_full_scipy(points: np.ndarray, periodic: bool = False) -> T
     dtfe : ndarray (N,)
         DTFE density estimate at each input point
     """
-    if periodic:
-        raise NotImplementedError("Periodic boundary conditions not implemented in scipy backend")
-    
     points = np.ascontiguousarray(points, dtype=np.double)
-    n_points = len(points)
+    n_points_original = len(points)
     
-    # Compute Delaunay triangulation
-    tri = Delaunay(points)
-    
-    # Get vertex indices for all tetrahedra
-    vertices = tri.simplices.astype(np.int64)
-    n_simplices = len(vertices)
-    
-    # Compute all properties (all in numba)
-    centers, radii = compute_circumcenters_and_radii(vertices, points)
-    volumes = compute_tetrahedron_volumes(vertices, points)
-    areas = compute_tetrahedron_areas(vertices, points)
-    dtfe = compute_dtfe_weights(vertices, volumes, n_points)
-    dtfe_interp = interpolate_dtfe_to_centers(vertices, dtfe, centers, points, radii)
+    if mode in ['periodic', 'lightcone']:
+        # Estimate box size if not provided
+        if boxsize is None:
+            bbox_min = points.min(axis=0)
+            bbox_max = points.max(axis=0)
+            box_size_vec = bbox_max - bbox_min
+            boxsize = max(box_size_vec)
+        
+        # Compute mean inter-particle spacing
+        n_points = n_points_original
+        mean_spacing = boxsize / (n_points ** (1/3))
+        
+        # Create periodic images
+        padded_points = []
+        shifts = [-boxsize, np.zeros(3), boxsize]
+        for dx in shifts:
+            for dy in shifts:
+                for dz in shifts:
+                    shift = np.array(dx) + np.array(dy) + np.array(dz)
+                    if np.all(shift == 0):
+                        padded_points.append(points)
+                    else:
+                        padded_points.append(points + shift)
+        
+        padded_points = np.vstack(padded_points)
+        n_points_padded = len(padded_points)
+        
+        # Define original box bounds
+        original_min = points.min(axis=0)
+        original_max = points.max(axis=0)
+        
+        # Compute Delaunay on padded points
+        tri = Delaunay(padded_points)
+        vertices = tri.simplices.astype(np.int64)
+        n_simplices = len(vertices)
+        
+        # Compute all properties (all in numba)
+        centers, radii = compute_circumcenters_and_radii(vertices, padded_points)
+        volumes = compute_tetrahedron_volumes(vertices, padded_points)
+        areas = compute_tetrahedron_areas(vertices, padded_points)
+        dtfe_padded = compute_dtfe_weights(vertices, volumes, n_points_padded)
+        dtfe_interp = interpolate_dtfe_to_centers(vertices, dtfe_padded, centers, padded_points, radii)
+        
+        # Filter to keep only voids with centers in original box
+        mask = ((centers[:, 0] >= original_min[0]) & (centers[:, 0] <= original_max[0]) &
+                (centers[:, 1] >= original_min[1]) & (centers[:, 1] <= original_max[1]) &
+                (centers[:, 2] >= original_min[2]) & (centers[:, 2] <= original_max[2]))
+        
+        centers = centers[mask]
+        radii = radii[mask]
+        volumes = volumes[mask]
+        areas = areas[mask]
+        dtfe_interp = dtfe_interp[mask]
+        
+        # Return DTFE for original points only
+        dtfe = dtfe_padded[:n_points_original]
+    else:
+        n_points = len(points)
+        
+        # Compute Delaunay triangulation
+        tri = Delaunay(points)
+        
+        # Get vertex indices for all tetrahedra
+        vertices = tri.simplices.astype(np.int64)
+        n_simplices = len(vertices)
+        
+        # Compute all properties (all in numba)
+        centers, radii = compute_circumcenters_and_radii(vertices, points)
+        volumes = compute_tetrahedron_volumes(vertices, points)
+        areas = compute_tetrahedron_areas(vertices, points)
+        dtfe = compute_dtfe_weights(vertices, volumes, n_points)
+        dtfe_interp = interpolate_dtfe_to_centers(vertices, dtfe, centers, points, radii)
     
     # Combine into output array
     output = np.column_stack([centers, radii, volumes, dtfe_interp, areas])
