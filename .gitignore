@@ -1,2 +1,9 @@
-# Build artifacts
-build/
+# Compiled and build artifacts
+__pycache__/
+*.pyc
+
+# Editor/IDE files
+.vscode/
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
