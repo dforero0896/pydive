@@ -376,13 +376,16 @@ def main():
                         help='Output directory for plots')
     parser.add_argument('--mode', type=str, default='periodic',
                         choices=['open', 'periodic', 'lightcone'],
-                        help='Boundary mode (default: periodic)')
+                        help="Boundary mode (default: periodic). Note: "
+                             "'lightcone' is treated as 'open' since "
+                             "lightcones are not periodic.")
     args = parser.parse_args()
     
     # Warn about memory usage for large datasets with periodic mode
-    if args.npoints > 50000 and args.mode in ['periodic', 'lightcone']:
-        print(f"⚠ WARNING: {args.npoints:,} points with '{args.mode}' mode will create ~{27*args.npoints:,} padded points.")
-        print("  This may require significant memory (>10GB). Consider using --npoints 10000 or --mode open.\n")
+    if args.npoints > 50000 and args.mode == 'periodic':
+        print(f"⚠ WARNING: {args.npoints:,} points with '{args.mode}' mode will replicate the "
+              "boundary shells of the box (extra points proportional to shell volume).")
+        print("  This may require significant memory. Consider using --npoints 10000 or --mode open.\n")
     
     print("=" * 60)
     print("PyDIVE - Void Statistics Visualization Example")
@@ -405,7 +408,9 @@ def main():
     # Compute full catalog
     print(f"\nComputing void catalog with mode='{args.mode}'...")
     try:
-        if args.mode == 'periodic' or args.mode == 'lightcone':
+        if args.mode == 'periodic':
+            # 'lightcone' falls through to the open branch below: lightcones
+            # are not periodic, so no padding is applied.
             voids, dtfe = get_void_catalog_full(points, mode=args.mode, boxsize=args.boxsize)
         else:
             voids, dtfe = get_void_catalog_full(points)

@@ -231,14 +231,19 @@ def compute_tetrahedron_areas(vertices: np.ndarray, points: np.ndarray) -> np.nd
     return areas
 
 
-@njit(parallel=True, fastmath=True)
+@njit(fastmath=True)
 def compute_dtfe_weights(vertices: np.ndarray, volumes: np.ndarray, n_points: int) -> np.ndarray:
     """
     Compute DTFE weights for each point.
-    
+
     DTFE density at a point is inversely proportional to the sum of volumes
     of all tetrahedra containing that point.
-    
+
+    Implemented as a single sequential loop over simplices with direct
+    accumulation into the per-point array: this avoids read-modify-write
+    data races between threads (which would corrupt the sums), and is
+    already JIT-compiled, so no Python-level loops are involved.
+
     Parameters
     ----------
     vertices : ndarray (n_simplices, 4)
@@ -247,28 +252,28 @@ def compute_dtfe_weights(vertices: np.ndarray, volumes: np.ndarray, n_points: in
         Volume for each tetrahedron
     n_points : int
         Total number of points
-        
+
     Returns
     -------
     dtfe : ndarray (n_points,)
         DTFE density estimate for each point
     """
     dtfe = np.zeros(n_points, dtype=np.double)
-    
+
     n_simplices = volumes.shape[0]
-    
+
     for k in range(n_simplices):
         vol = volumes[k]
         for i in range(4):
             idx = vertices[k, i]
             if idx < n_points:
                 dtfe[idx] += vol
-    
+
     # Convert to density (inverse of volume)
     for i in range(n_points):
         if dtfe[i] > 0:
             dtfe[i] = 4.0 / dtfe[i]  # Factor of 4 for tetrahedra
-    
+
     return dtfe
 
 
@@ -318,7 +323,44 @@ def interpolate_dtfe_to_centers(vertices: np.ndarray, dtfe: np.ndarray,
     return dtfe_interp
 
 
-def get_void_catalog_scipy(points: np.ndarray, mode: str = 'open', boxsize: float = None) -> np.ndarray:
+def _mean_free_path(n_points: int, box_volume: float) -> float:
+    """Mean inter-particle distance ``(n/V)**(-1/3)``, matching the CGAL backend."""
+    return (n_points / box_volume) ** (-1.0 / 3.0)
+
+
+def _pad_periodic_shell(points: np.ndarray, box_min: np.ndarray,
+                        box_max: np.ndarray, cpy_range: float) -> np.ndarray:
+    """
+    Replicate only the boundary shells of the box (not the full 27 images).
+
+    This mirrors ``cdelaunay_periodic_extend`` in the CGAL backend: points
+    within ``cpy_range`` of each low/high face are copied across that face by
+    exactly one box length. Corner/edge regions are duplicated once per axis,
+    which is sufficient to recover the correct local neighbourhoods. Tiling
+    all 27 periodic images would inflate memory and triangulation time by
+    ~27x while producing the same simplices inside the box.
+
+    Note: scipy.spatial.Delaunay (Qhull) has no native periodic Delaunay
+    triangulation, so this shell padding is required for periodic boundaries.
+    """
+    box_size = box_max - box_min
+    reps = [points]
+    for ax in range(3):
+        near_lo = points[:, ax] < box_min[ax] + cpy_range
+        q = points[near_lo].copy()
+        q[:, ax] += box_size[ax]
+        reps.append(q)
+
+        near_hi = points[:, ax] >= box_max[ax] - cpy_range
+        q = points[near_hi].copy()
+        q[:, ax] -= box_size[ax]
+        reps.append(q)
+
+    return np.ascontiguousarray(np.vstack(reps), dtype=np.double)
+
+
+def get_void_catalog_scipy(points: np.ndarray, mode: str = 'open', boxsize: float = None,
+                           cpy_range: float = 0.0) -> np.ndarray:
     """
     Get basic void catalog using SciPy backend.
     
@@ -327,20 +369,27 @@ def get_void_catalog_scipy(points: np.ndarray, mode: str = 'open', boxsize: floa
     points : ndarray (N, 3)
         Input point coordinates
     mode : str, optional
-        Boundary mode: 'open' (no padding), 'periodic' (pad with periodic images),
-        or 'lightcone' (same as periodic for now). Default is 'open'.
+        Boundary mode: 'open' (no padding; also used for 'lightcone', since
+        lightcones are not periodic) or 'periodic' (replicate boundary shells
+        of the box). Default is 'open'.
     boxsize : float, optional
-        Box size for periodic boundary conditions. If None, estimated from
-        point distribution as max(bbox_max - bbox_min).
-        
+        Box size for periodic boundary conditions (box assumed to span
+        [0, boxsize]). If None, estimated from point distribution as
+        max(bbox_max - bbox_min).
+    cpy_range : float, optional
+        Width of the replicated boundary shell. If 0 (default), uses
+        8 * mean inter-particle distance, matching the CGAL backend.
+
     Returns
     -------
     output : ndarray (n_simplices, 4)
         Array with columns [x, y, z, r] for each simplex circumcenter
     """
     points = np.ascontiguousarray(points, dtype=np.double)
-    
-    if mode in ['periodic', 'lightcone']:
+
+    # Note: 'lightcone' is treated as 'open': a lightcone has no periodic
+    # dimension to wrap around, so no padding is applied.
+    if mode == 'periodic':
         # Estimate box size if not provided
         if boxsize is None:
             bbox_min = points.min(axis=0)
@@ -348,38 +397,21 @@ def get_void_catalog_scipy(points: np.ndarray, mode: str = 'open', boxsize: floa
             box_size_vec = bbox_max - bbox_min
             boxsize = max(box_size_vec)
         
-        # Compute mean inter-particle spacing
-        n_points = len(points)
-        mean_spacing = boxsize / (n_points ** (1/3))
-        
-        # Pad by 2x mean spacing
-        pad_width = 2 * mean_spacing
-        
-        # Create periodic images
-        padded_points = []
-        shifts = [-boxsize, np.zeros(3), boxsize]
-        for dx in shifts:
-            for dy in shifts:
-                for dz in shifts:
-                    shift = np.array(dx) + np.array(dy) + np.array(dz)
-                    if np.all(shift == 0):
-                        padded_points.append(points)
-                    else:
-                        padded_points.append(points + shift)
-        
-        padded_points = np.vstack(padded_points)
+        box_min = np.zeros(3, dtype=np.double)
+        box_max = np.full(3, boxsize, dtype=np.double)
+
+        # Copy range: default to 8x the mean inter-particle distance,
+        # consistent with cdelaunay_periodic_extend in the CGAL backend.
+        mfp = _mean_free_path(len(points), boxsize ** 3)
+        copy_range = cpy_range if cpy_range > 0 else 8 * mfp
+
+        # Replicate only the boundary shells (workaround for Qhull not
+        # supporting periodic Delaunay triangulations natively)
+        padded_points = _pad_periodic_shell(points, box_min, box_max, copy_range)
         
         # Define original box bounds (assume centered or from 0)
-        if boxsize is not None:
-            # Assume box from 0 to boxsize if points are in that range
-            bbox_min_orig = points.min(axis=0)
-            bbox_max_orig = points.max(axis=0)
-            # Use the original bounding box
-            original_min = bbox_min_orig
-            original_max = bbox_max_orig
-        else:
-            original_min = points.min(axis=0)
-            original_max = points.max(axis=0)
+        original_min = box_min
+        original_max = box_max
         
         # Compute Delaunay on padded points
         tri = Delaunay(padded_points)
@@ -411,21 +443,27 @@ def get_void_catalog_scipy(points: np.ndarray, mode: str = 'open', boxsize: floa
     return output
 
 
-def get_void_catalog_full_scipy(points: np.ndarray, mode: str = 'open', boxsize: float = None) -> Tuple[np.ndarray, np.ndarray]:
+def get_void_catalog_full_scipy(points: np.ndarray, mode: str = 'open', boxsize: float = None,
+                                cpy_range: float = 0.0) -> Tuple[np.ndarray, np.ndarray]:
     """
     Get full void catalog with DTFE, volumes, and areas using SciPy backend.
-    
+
     Parameters
     ----------
     points : ndarray (N, 3)
         Input point coordinates
     mode : str, optional
-        Boundary mode: 'open' (no padding), 'periodic' (pad with periodic images),
-        or 'lightcone' (same as periodic for now). Default is 'open'.
+        Boundary mode: 'open' (no padding; also used for 'lightcone', since
+        lightcones are not periodic) or 'periodic' (replicate boundary shells
+        of the box). Default is 'open'.
     boxsize : float, optional
-        Box size for periodic boundary conditions. If None, estimated from
-        point distribution as max(bbox_max - bbox_min).
-        
+        Box size for periodic boundary conditions (box assumed to span
+        [0, boxsize]). If None, estimated from point distribution as
+        max(bbox_max - bbox_min).
+    cpy_range : float, optional
+        Width of the replicated boundary shell. If 0 (default), uses
+        8 * mean inter-particle distance, matching the CGAL backend.
+
     Returns
     -------
     output : ndarray (n_simplices, 7)
@@ -435,37 +473,34 @@ def get_void_catalog_full_scipy(points: np.ndarray, mode: str = 'open', boxsize:
     """
     points = np.ascontiguousarray(points, dtype=np.double)
     n_points_original = len(points)
-    
-    if mode in ['periodic', 'lightcone']:
+
+    # Note: 'lightcone' is treated as 'open': a lightcone has no periodic
+    # dimension to wrap around, so no padding is applied.
+    if mode == 'periodic':
         # Estimate box size if not provided
         if boxsize is None:
             bbox_min = points.min(axis=0)
             bbox_max = points.max(axis=0)
             box_size_vec = bbox_max - bbox_min
             boxsize = max(box_size_vec)
-        
-        # Compute mean inter-particle spacing
-        n_points = n_points_original
-        mean_spacing = boxsize / (n_points ** (1/3))
-        
-        # Create periodic images
-        padded_points = []
-        shifts = [-boxsize, np.zeros(3), boxsize]
-        for dx in shifts:
-            for dy in shifts:
-                for dz in shifts:
-                    shift = np.array(dx) + np.array(dy) + np.array(dz)
-                    if np.all(shift == 0):
-                        padded_points.append(points)
-                    else:
-                        padded_points.append(points + shift)
-        
-        padded_points = np.vstack(padded_points)
+
+        box_min = np.zeros(3, dtype=np.double)
+        box_max = np.full(3, boxsize, dtype=np.double)
+
+        # Copy range: default to 8x the mean inter-particle distance,
+        # consistent with cdelaunay_periodic_full in the CGAL backend.
+        mfp = _mean_free_path(n_points_original, boxsize ** 3)
+        copy_range = cpy_range if cpy_range > 0 else 8 * mfp
+
+        # Replicate only the boundary shells (workaround for Qhull not
+        # supporting periodic Delaunay triangulations natively)
+        padded_points = _pad_periodic_shell(points, box_min, box_max, copy_range)
         n_points_padded = len(padded_points)
-        
+
         # Define original box bounds
-        original_min = points.min(axis=0)
-        original_max = points.max(axis=0)
+        original_min = box_min
+        original_max = box_max
+
         
         # Compute Delaunay on padded points
         tri = Delaunay(padded_points)
