@@ -62,6 +62,33 @@ Demonstrates:
 python example_benchmark.py
 ```
 
+### 5. Postprocessing & Pruned Catalog (`example_postprocess.py`)
+Demonstrates the `pydive.postprocess` module end-to-end:
+- Building a raw (overlapping) void catalog from a clustered point set
+- Pruning it to the largest non-overlapping spheres with
+  `filter_non_overlapping` (periodic boundaries supported)
+- Merging shallow overlaps (`merge_threshold=0.2`) and the full
+  central/satellite decomposition with `central_satellite_split`
+- Plotting, for the **pruned** void catalog:
+  - the void size function (`dN/dlnR`, pruned vs raw)
+  - the DTFE density distribution at void centres
+  - the volume and surface-area distributions
+  - area & volume versus radius
+
+**Requirements:** numpy, scipy, numba, matplotlib
+
+**Run:**
+```bash
+python example_postprocess.py
+```
+
+**Output files** (written to `examples/results_postprocess/`):
+- `void_size_function.png`
+- `density_distribution.png`
+- `area_volume_distribution.png`
+- `area_volume_vs_radius.png`
+- `catalog_raw.txt`, `catalog_pruned.txt`, `catalog_merged.txt`
+
 ## Quick Start
 
 If you're new to pydive, start with the basic example:
