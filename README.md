@@ -2,16 +2,29 @@
 ## Python version of [DIVE](https://github.com/cheng-zhao/DIVE)
 
 
-This is the (extended) version of the DIVE code by Cheng Zhao. It is now CGAL based entirely, including features previously available only on the Scipy backend like computing simplex areas, volumes, sphericity. There are also routines available to split the void sample into central and satellite voids. 
+This is the (extended) version of the DIVE code by Cheng Zhao. It offers two interchangeable backends:
 
-The Scipy backend has been deprecated in the latest version in favor of the faster CGAL implementation. 
+- **CGAL backend** (`backend='cgal'`): the fastest implementation, entirely CGAL based, including features previously available only on the SciPy backend like computing simplex areas, volumes, sphericity. There are also routines available to split the void sample into central and satellite voids, and sky-to-cartesian coordinate conversions (which use GSL). Requires compiling against CGAL/GSL (see Compilation notes below and `INSTALL_CGAL.md`).
+- **SciPy + Numba backend** (`backend='scipy'`): a pure-Python fallback using `scipy.spatial.Delaunay` (Qhull) with JIT-compiled (Numba) loops for all heavy computation — no Python-level loops over simplices. Easier to install (no C++ toolchain needed); somewhat slower than CGAL but fully functional, including periodic boundaries.
+
+The top-level API auto-selects the best available backend:
+
+```python
+from pydive import get_void_catalog, get_void_catalog_full, check_backend_status
+voids = get_void_catalog(points)                  # CGAL if available, else SciPy
+voids = get_void_catalog(points, backend='scipy') # force SciPy
+check_backend_status()                            # show what is installed
+```
 
 ### Features
 To replicate the functionality of `DIVE`, one must use the function `get_void_catalog_cgal`.
-Running `pydive` on periodic boxes can now be done in two ways: With `periodic_mode=0` the boundaries of the box are extended by a distance of 5 * `(n_objects/box_volume)**(-1./3)`. This setting is much faster but uses up more memory due to the copying of points. With `periodic_mode=1` the periodic triangulation data structures in CGAL are used. For some reason this results in ~5x slower run time.
+Running `pydive` on periodic boxes can be done in two ways with the CGAL backend: With `periodic_mode=0` the boundary shells of the box are replicated out to a distance `cpy_range` (default: 8 * `(n_objects/box_volume)**(-1./3)`, i.e. 8 times the mean interparticle distance; only points within that range of each face are copied, not the full box images). This setting is much faster but uses up more memory due to the copying of points. With `periodic_mode=1` the true periodic triangulation data structures in CGAL are used (no duplication at all). For some reason this results in ~5x slower run time.
+
+The SciPy backend uses the same shell-replication strategy (`mode='periodic'`, `boxsize=...`, optional `cpy_range=...`) because Qhull (`scipy.spatial.Delaunay`) has **no native periodic Delaunay triangulation**; the padding is therefore a requirement of SciPy, not just a workaround for CGAL limitations. The default copy range matches the CGAL backend so both produce consistent catalogs.
+
+Boundary modes for the SciPy backend: `'open'` (no padding), `'periodic'` (replicate boundary shells), and `'lightcone'` — which is treated exactly like `'open'`, since lightcones are not periodic and must not be wrapped.
 
 In addition, one may compute other features of the triangulation. For now, you may compute simplex area, volume, DTFE density estimation (at points and void positions). In a future a feature selection could be added to improve performance. To do this on periodic boxes, only duplicating boundaries is available given that CGAL vertex info is used and that is not available for periodic triangulation vertices for now. These features are available with the `get_void_catalog_full` function. See below for use examples.
-I have also added routines for sky to cartesian coordinate conversion (which use GSL).
 
 ## Compilation notes
 
@@ -63,43 +76,62 @@ archivePrefix = {arXiv},
 
 `DIVE` functionality: Delaunay tesselation and computing circumsphere positions/radii.
 ```python
-sys.path.append("/home/astro/dforero/codes/pydive/pydive") # add library location to path
-from pydive.pydive import get_void_catalog_cgal
+import numpy as np, time
+from pydive import get_void_catalog
 
 N = int(5e5)
 np.random.seed(42)
-points_raw = np.random.random((N,4)) * 2500
-s = time.time()
-periodic=True
-voids = get_void_catalog_cgal(points_raw, 
-                            periodic=periodic, 
-                            periodic_mode = 0
-                            )
-print(f"CGAL took {time.time() - s} s", flush=True)
-# Select points inside the original box
-mask = (voids[:,:3] > 0).all(axis=1) & (voids[:,:3] < 2500).all(axis=1)
-voids = voids[mask]
+points_raw = np.random.random((N, 3)) * 2500
 
+# CGAL backend (requires compiled extension)
+s = time.time()
+voids = get_void_catalog(points_raw, backend='cgal',
+                         periodic=True,
+                         box_min=[0., 0., 0.], box_max=[2500.]*3,
+                         periodic_mode=0)
+print(f"CGAL took {time.time() - s} s", flush=True)
+# With periodic_mode=0 voids outside the original box are filtered out by the
+# backend; with mode selection left to the caller:
+mask = (voids[:, :3] >= 0).all(axis=1) & (voids[:, :3] <= 2500).all(axis=1)
+voids = voids[mask]
 ```
+
+The same catalog with the SciPy+Numba backend (no compilation needed; periodic
+boundaries handled via boundary-shell replication):
+```python
+from pydive import get_void_catalog
+
+voids = get_void_catalog(points_raw, backend='scipy',
+                         mode='periodic', boxsize=2500.)
+```
+
 Computing extra features:
 ```python
-sys.path.append("/home/astro/dforero/codes/pydive/pydive") # add library location to path
-from pydive.pydive import get_void_catalog_full
+import numpy as np, time
+from pydive import get_void_catalog_full
 
 N = int(5e5)
 np.random.seed(42)
-points_raw = np.random.random((N,4)) * 2500
+points_raw = np.random.random((N, 3)) * 2500
 s = time.time()
-periodic=True
-voids, dtfe = get_void_catalog_full(points_raw, 
-                            periodic=periodic, 
-                            )
+voids, dtfe = get_void_catalog_full(points_raw, backend='cgal',
+                                    periodic=True,
+                                    box_min=[0., 0., 0.], box_max=[2500.]*3)
 # dtfe corresponds to the DTFE density estimation at point positions.
 # so far no selection function is considered but it should be in a near future
 print(f"CGAL took {time.time() - s} s", flush=True)
 # Select points inside the original box
-mask = (voids[:,:3] > 0).all(axis=1) & (voids[:,:3] < 2500).all(axis=1)
+mask = (voids[:, :3] > 0).all(axis=1) & (voids[:, :3] < 2500).all(axis=1)
 voids = voids[mask]
-
 ```
+
+Or with the SciPy backend (output columns: x, y, z, r, volume, dtfe_interp, area;
+the periodic filter to the original box is applied automatically):
+```python
+voids, dtfe = get_void_catalog_full(points_raw, backend='scipy',
+                                    mode='periodic', boxsize=2500.)
+```
+
+Note on boundary modes: `'lightcone'` is equivalent to `'open'` — lightcones
+are not periodic, so no wrapping/padding is applied in that direction.
 ![alt text](https://github.com/dforero0896/pydive/blob/cgal/tests/dtfe.png?raw=true)
