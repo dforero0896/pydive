@@ -1,1 +1,15 @@
-(empty)
+# CMake build artifacts
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.bak
+
+# Compiled binaries and object files
+*.o
+*.obj
+*.so
+*.a
+*.dll
+*.exe
+*.out
