@@ -1,5 +1,0 @@
-/global/homes/d/dforero/codes/pydive/pydive/CMakeFiles/edit_cache.dir
-/global/homes/d/dforero/codes/pydive/pydive/CMakeFiles/rebuild_cache.dir
-/global/homes/d/dforero/codes/pydive/pydive/CMakeFiles/cgal_check_build_system.dir
-/global/homes/d/dforero/codes/pydive/pydive/CMakeFiles/ALL_CGAL_TARGETS.dir
-/global/homes/d/dforero/codes/pydive/pydive/CMakeFiles/delaunay_backend.dir
